@@ -54,6 +54,15 @@ class DatabaseSeeder extends Seeder
             "email" => "tokutoku@gmail.com",
             "contact" => "081938713808"
         ]);
+        Company::create([
+            "name" => "Tokopedia",
+            "profile" => "img.jpg",
+            "bio" => "Mulai aja dulu",
+            "address" => "Jakarta Selatan",
+            "category" => "Technology",
+            "email" => "tokopedia@gmail.com",
+            "contact" => "081938713808"
+        ]);
 
         Company::create([
             "name" => "BukaBuku",
