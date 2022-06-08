@@ -49,4 +49,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function company()
+    {
+        return $this->belongsTo('App\Models\Company', 'company_id');
+    }
+
+    public function projectMembers()
+    {
+        return $this->hasMany('App\Models\ProjectMember');
+    }
+    public function applies()
+    {
+        return $this->hasMany('App\Models\Apply');
+    }
+
 }

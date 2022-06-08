@@ -16,4 +16,18 @@ class ProjectMember extends Model
         'user_id',
         'certificate',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo('App\Models\Project');
+    }
+
+    public function projectRole()
+    {
+        return $this->belongsTo('App\Models\ProjectRole');
+    }
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
 }

@@ -16,4 +16,22 @@ class Project extends Model
         'active',
         'company_id',
     ];
+
+    public function company()
+    {
+        return $this->belongsTo('App\Models\Company');
+    }
+
+    public function projectRoles()
+    {
+        return $this->hasMany('App\Models\ProjectRole');
+    }
+    public function projectMembers()
+    {
+        return $this->hasMany('App\Models\ProjectMember');
+    }
+    public function applies()
+    {
+        return $this->hasMany('App\Models\Apply');
+    } 
 }

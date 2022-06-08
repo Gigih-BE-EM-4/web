@@ -16,4 +16,18 @@ class ProjectRole extends Model
         'project_id',
         'extra_question',
     ];
+
+    public function projecs()
+    {
+        return $this->hasMany('App\Models\Project');
+    }
+
+    public function projectMembers()
+    {
+        return $this->hasMany('App\Models\ProjectMember');
+    }
+    public function applies()
+    {
+        return $this->hasMany('App\Models\Apply');
+    } 
 }
