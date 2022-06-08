@@ -26,6 +26,16 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Company::create([
+            "name" => "TiketTiket",
+            "profile" => "img.jpg",
+            "bio" => "TiketTiket is the best bro",
+            "address" => "Jakarta Selatan",
+            "category" => "Technology",
+            "email" => "tikettiket@gmail.com",
+            "contact" => "081938713808"
+        ]);
+
+        Company::create([
             "name" => "TokuToku",
             "profile" => "img.jpg",
             "bio" => "TokuToku is the best bro",
