@@ -44,5 +44,9 @@ class DatabaseSeeder extends Seeder
             "email" => "bukabuku@gmail.com",
             "contact" => "081938713808"
         ]);
+
+        $this->call([
+            UserSeeder::class,
+        ]);
     }
 }
