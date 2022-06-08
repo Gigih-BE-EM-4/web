@@ -24,7 +24,15 @@ class DatabaseSeeder extends Seeder
             "email" => "golek@gmail.com",
             "contact" => "081938713808"
         ]);
-
+        Company::create([
+            "name" => "DanaSegar",
+            "profile" => "img.jpg",
+            "bio" => "DanaSegar is the best bro",
+            "address" => "Jakarta Selatan",
+            "category" => "Technology",
+            "email" => "danasegar@gmail.com",
+            "contact" => "081938713808"
+        ]);
         Company::create([
             "name" => "MoguMogu",
             "profile" => "img.jpg",
