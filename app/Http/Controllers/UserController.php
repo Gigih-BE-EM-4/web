@@ -29,7 +29,7 @@ class UserController extends Controller
     public function login (Request $request){
         if(Auth::attempt(['email'=> $request->email, 'password'=>$request->password])){
             $user = Auth::user();
-            $token = $user->createToken('MyApp')->plainTextToken;
+            $token = $user->createToken('CPToken')->plainTextToken;
             return response()->json([
                 "message" => "User logged in successfully",
                 "token" => $token,
