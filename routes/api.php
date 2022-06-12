@@ -15,9 +15,39 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('register', [App\Http\Controllers\UserController::class, 'register']);
-Route::post('login', [App\Http\Controllers\UserController::class, 'login'])->name("login");
+Route::post('login', [App\Http\Controllers\UserController::class, 'login'])->name("user");
 Route::get('notAuthenticated', [App\Http\Controllers\ErrorController::class, 'notAuthenticated'])->name("notAuthenticated");
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+Route::group(function(){
+
+    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::middleware('isAdmin')->get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+
+
+})->name("user");
+
+
+Route::group(function(){
+
+    
+
+})->name("company");
+
+
+
+
+
+
+
+
+
+
+
+
