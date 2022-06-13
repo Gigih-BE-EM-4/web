@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 use function PHPSTORM_META\type;
@@ -37,13 +39,18 @@ class CompanyController extends Controller
         $validator = $this->makeValidator($request);
 
         if($validator->fails()){
-            ResponseFormatter::error(null, "Unprocessable Entity", 422, $validator->errors());
+            return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validator->errors());
         }
 
         $validatedData = $validator->validated();
         $validatedData['bio'] = $request['bio'];
         $validatedData['profile'] = $this->uploadImage($request);
-        Company::create($validatedData);
+        
+        $company = Company::create($validatedData);
+
+        User::find(Auth::user()->id)->update([
+            'company_id' => $company->id
+        ]);
     
         return ResponseFormatter::success($validatedData, "Company has been created", 201, 'success');
     }
