@@ -33,7 +33,8 @@ class CompanyControllerTest extends TestCase
             'email' => 'sobatkerja@gmail.com',
             'contact' => '081287127817271'
         ]);
-
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
         $response->assertCreated()->assertExactJson([
             'meta' => [
                 'code' => 201,
