@@ -20,14 +20,21 @@ class UserController extends Controller
         ]);
     }
 
+    private function loginValidator(Request $request){
+        return Validator::make($request->all(), [
+            'username' => 'required',
+            'password' => 'required|min:8',
+        ]);
+    }
+
     public function register(Request $request){
         $validate = $this->registerValidator($request);
         if(!$validate->fails()){
             $user = User::create([
                 "name" => $request->name,
                 "email" => $request->email,
-                "username" => $request->email,
-                "address" => $request->email,
+                "username" => $request->username,
+                "address" => $request->address,
                 "password" => bcrypt($request->password),
             ]);
             if($user){
@@ -41,17 +48,22 @@ class UserController extends Controller
     }
 
     public function login (Request $request){
-        
-        if(Auth::attempt(['email'=> $request->email, 'password'=>$request->password])){
-            $user = Auth::user();
-            $token = $user->createToken('CPToken')->plainTextToken;
-            return response()->json([
-                "message" => "User logged in successfully",
-                "token" => $token,
-                "user" => $user
-            ], 200);
+        $validate = $this->loginValidator($request);
+        if(!$validate->fails()){
+            if(Auth::attempt(['email'=> $request->username, 'password'=>$request->password]) || Auth::attempt(['username'=> $request->username, 'password'=>$request->password])){
+                $user = Auth::user();
+                $token = $user->createToken('CPToken')->plainTextToken;
+                return response()->json([
+                    "message" => "User logged in successfully",
+                    "token" => $token,
+                    "user" => $user
+                ], 200);
+            }else{
+                return ResponseFormatter::error(null, "User not authenticated", 401, "user/password not match");
+            }
         }else{
-            return $this->err->notAuthenticated();
+            return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
         }
+        
     }
 }
