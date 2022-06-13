@@ -111,4 +111,12 @@ class UserController extends Controller
             return ResponseFormatter::error(null, "User not found", 404, "user not found");
         }
     }
+    public function isVerify(){
+        $user = Auth::User();
+        if($user->verify != null){
+            return ResponseFormatter::error(null, "User not verified", 401, "user not verified");
+        }else{
+            return ResponseFormatter::success($user, "user is verified", 200, 'success');
+        }
+    }
 }
