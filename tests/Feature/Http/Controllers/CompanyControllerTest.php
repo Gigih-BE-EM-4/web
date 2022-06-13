@@ -38,19 +38,20 @@ class CompanyControllerTest extends TestCase
         $response->assertCreated()->assertExactJson([
             'meta' => [
                 'code' => 201,
-                'status' => 'created',
+                'status' => 'success',
                 'message' => 'Company has been created'
             ],
             'data' => [
                 'name' => 'Sobat Kerja',
-                'profile' => public_path() . '/Company/Profile/' . $time . $fileName,
-                'bio' => 'Perusahaan terbaik di jakarta raya',
                 'address' => 'Jakarta Selatan',
                 'category' => 'Technology',
                 'email' => 'sobatkerja1@gmail.com',
-                'contact' => '081287127817271'
+                'contact' => '081287127817271',
+                'profile' => '/Company/Profile/' . $time . $fileName,
+                'bio' => 'Perusahaan terbaik di jakarta raya',
             ]
         ]);
+        unlink(public_path() . '/Company/Profile/' . $time . $fileName);
     }
 
     // public function test_create_company_without_name_field(){

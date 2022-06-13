@@ -40,10 +40,11 @@ class CompanyController extends Controller
             ResponseFormatter::error(null, "Unprocessable Entity", 422, $validator->errors());
         }
 
-        $request['profile'] = $this->uploadImage($request);
-
-        Company::create($request->toArray());
-        dd(Company::all());
-        ResponseFormatter::success(null, "Success Created Company", 201, 'success');
+        $validatedData = $validator->validated();
+        $validatedData['bio'] = $request['bio'];
+        $validatedData['profile'] = $this->uploadImage($request);
+        Company::create($validatedData);
+    
+        return ResponseFormatter::success($validatedData, "Company has been created", 201, 'success');
     }
 }
