@@ -4,29 +4,44 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Validator;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
-{
-    public function register(Request $request){
-        $user = User::create([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => bcrypt($request->password),
+{   
+    private function registerValidator(Request $request){
+        return Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|unique:users,email|email',
+            'username' => 'required|unique:users',
+            'address' => 'required',
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|same:password',
         ]);
-        if($user){
-            return response()->json([
-                "message" => "User created successfully",
-                "user" => $user
-            ], 201);
+    }
+
+    public function register(Request $request){
+        $validate = $this->registerValidator($request);
+        if(!$validate->fails()){
+            $user = User::create([
+                "name" => $request->name,
+                "email" => $request->email,
+                "username" => $request->email,
+                "address" => $request->email,
+                "password" => bcrypt($request->password),
+            ]);
+            if($user){
+                return ResponseFormatter::success($user, "user has been created", 201, 'success');
+            }else{
+                return ResponseFormater::error(null, "User not created", 400, "internal error");
+            }
         }else{
-            return response()->json([
-                "message" => "User not created"
-            ], 500);
+            return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
         }
     }
 
     public function login (Request $request){
+        
         if(Auth::attempt(['email'=> $request->email, 'password'=>$request->password])){
             $user = Auth::user();
             $token = $user->createToken('CPToken')->plainTextToken;
@@ -36,9 +51,7 @@ class UserController extends Controller
                 "user" => $user
             ], 200);
         }else{
-            return response()->json([
-                "message" => "User not found"
-            ], 401);
+            return $this->err->notAuthenticated();
         }
     }
 }

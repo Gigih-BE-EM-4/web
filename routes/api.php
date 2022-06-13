@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('register', [App\Http\Controllers\UserController::class, 'register']);
+Route::post('user/register', [App\Http\Controllers\UserController::class, 'register']);
 Route::post('login', [App\Http\Controllers\UserController::class, 'login'])->name("user");
 Route::get('notAuthenticated', [App\Http\Controllers\ErrorController::class, 'notAuthenticated'])->name("notAuthenticated");
 
