@@ -119,4 +119,13 @@ class UserController extends Controller
             return ResponseFormatter::success($user, "user is verified", 200, 'success');
         }
     }
+
+    public function detail($id) {
+        $user = User::findOrFail($id);
+        if($user){
+            return ResponseFormatter::success($user, "user has been found", 200, 'success');
+        }else{
+            return ResponseFormatter::error(null, "User not found", 404, "user not found");
+        }
+    }
 }
