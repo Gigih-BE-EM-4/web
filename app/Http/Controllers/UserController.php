@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Validator;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,6 +37,7 @@ class UserController extends Controller
                 "username" => $request->username,
                 "address" => $request->address,
                 "password" => bcrypt($request->password),
+                "verify"=> Str::random(40),
             ]);
             if($user){
                 return ResponseFormatter::success($user, "user has been created", 201, 'success');
