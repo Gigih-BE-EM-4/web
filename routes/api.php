@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,8 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('user/register', [App\Http\Controllers\UserController::class, 'register']);
-Route::post('user/login', [App\Http\Controllers\UserController::class, 'login'])->name("user");
+Route::post('user/register', [UserController::class, 'register']);
+Route::post('user/login', [UserController::class, 'login'])->name("user");
 Route::get('notAuthenticated', [App\Http\Controllers\ErrorController::class, 'notAuthenticated'])->name("notAuthenticated");
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -27,16 +28,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/company', [CompanyController::class, 'store']);
 });
 
-// Route::group(function(){
 
-//     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//         return $request->user();
-//     });
 
-//     Route::middleware('isAdmin')->get('/user', function (Request $request) {
-//         return $request->user();
-//     });
-// })->name("user");
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('user', [UserController::class, 'update'])->name("user.update");
+});
 
 
 

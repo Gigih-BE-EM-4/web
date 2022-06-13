@@ -47,6 +47,19 @@ class UserController extends Controller
         }
     }
 
+    private function updateValidator(Request $request){
+        return Validator::make($request->all(), [
+            'name' => 'required',
+            "address" => 'min:1',
+        ]);
+    }
+    private function confirmPasswordValidator(Request $request){
+        return Validator::make($request->all(),[
+            'password' => 'required|min:8',
+            'confirm_password' => 'required|same:password',
+        ]);
+    }
+    
     public function login (Request $request){
         $validate = $this->loginValidator($request);
         if(!$validate->fails()){
@@ -61,5 +74,28 @@ class UserController extends Controller
             return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
         }
         
+    }
+
+    public function update (Request $request){
+        $validate = $this->updateValidator($request);
+        if(!$validate->fails()){
+            if(isset($request->password)){
+                $pwValidate = $this->confirmPasswordValidator($request);
+                if(!$pwValidate->fails()){
+                    $request->merge(['password' => bcrypt($request->password)]);
+                }else{
+                    return ResponseFormatter::error(null, "Unprocessable Entity", 422, $pwValidate->errors());
+                }
+
+            }
+            $user = Auth::User()->update($request->all());
+            if($user){
+                return ResponseFormatter::success($user, "user has been updated", 201, 'success');
+            }else{
+                return ResponseFormatter::error(null, "User not updated", 400, "internal error");
+            }
+        }else{
+            return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
+        }
     }
 }
