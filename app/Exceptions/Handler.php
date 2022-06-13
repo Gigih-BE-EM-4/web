@@ -2,8 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Http\Controllers\ResponseFormatter;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
@@ -36,6 +38,10 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+        
+        $this->renderable(function (AuthenticationException $e){
+            return ResponseFormatter::error(null, 'Unauthenticated', 401, $e->getMessage());
         });
     }
 }

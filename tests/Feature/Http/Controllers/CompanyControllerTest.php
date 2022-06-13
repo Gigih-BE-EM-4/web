@@ -405,7 +405,7 @@ class CompanyControllerTest extends TestCase
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
     }
 
-    // Test Create Company With Duplicate Email
+    // Test Create Company With Duplicate Name
     public function test_create_company_with_duplicate_name(){
         Sanctum::actingAs(
             User::factory()->create()
@@ -479,5 +479,49 @@ class CompanyControllerTest extends TestCase
         ]);
 
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
+    }
+
+    // Test Create Company With Duplicate Name
+    public function test_create_company_with_unauthenticated_user(){
+
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+
+        $response = $this->postJson('/api/company', [
+            'name' => 'Perunas',
+            'profile' => $profile,
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'perunas@gmail.com',
+            'contact' => '081287127817271'
+        ]);
+
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
+
+        $response->assertStatus(401)->assertExactJson([
+            'meta' => [
+                'code' => 401,
+                'status' => 'error',
+                'message' => 'Unauthenticated'
+            ],
+            'data' => null,
+            'errors' => "Unauthenticated."
+        ]);
+
+        $this->assertDatabaseMissing('companies', [
+            'name' => 'Perunas',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'perunas@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
+        $this->assertDatabaseMissing('users', [
+            'company_id' => 11
+        ]);
     }
 }
