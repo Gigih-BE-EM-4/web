@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum','isVerify'])->group(function () {
     Route::post('user', [UserController::class, 'update'])->name("user.update");
 });
 
