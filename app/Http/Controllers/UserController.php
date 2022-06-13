@@ -128,4 +128,12 @@ class UserController extends Controller
             return ResponseFormatter::error(null, "User not found", 404, "user not found");
         }
     }
+
+    public function logOut() {
+        if(Auth::User()->currentAccessToken()->delete()){
+            return ResponseFormatter::success(null, "user has been logged out", 200, 'success');
+        }else{
+            return ResponseFormatter::error(null, "User not logged out", 400, "internal error");
+        }
+    }
 }
