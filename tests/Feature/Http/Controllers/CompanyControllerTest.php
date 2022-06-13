@@ -18,6 +18,8 @@ class CompanyControllerTest extends TestCase
      *
      * @return void
      */
+
+    // Test Create Company With Valid Data
     public function test_create_company_with_valid_data()
     {
         $user = User::factory()->create();
@@ -71,6 +73,7 @@ class CompanyControllerTest extends TestCase
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
     }
 
+    // Test Create Company Without Name Field
     public function test_create_company_without_name_field(){
         Sanctum::actingAs(
             User::factory()->create()
@@ -113,17 +116,18 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
+    // Test Create Company Without Address Field
     public function test_create_company_without_address_field(){
         Sanctum::actingAs(
             User::factory()->create()
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Belajar',
             'profile' => $profile,
             'bio' => 'Perusahaan terbaik di jakarta raya',
             'category' => 'Technology',
-            'email' => 'sobatkerja3@gmail.com',
+            'email' => 'sobatbelajar@gmail.com',
             'contact' => '081287127817271'
         ]);
         $time = time();
@@ -141,9 +145,9 @@ class CompanyControllerTest extends TestCase
             ]
         ]);
         $this->assertDatabaseMissing('companies', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Belajar',
             'category' => 'Technology',
-            'email' => 'sobatkerja3@gmail.com',
+            'email' => 'sobatbelajar@gmail.com',
             'contact' => '081287127817271',
             'profile' => '/Company/Profile/' . $time . $fileName,
             'bio' => 'Perusahaan terbaik di jakarta raya',
@@ -154,17 +158,18 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
+    // Test Create Company Without Category Field
     public function test_create_company_without_category_field(){
         Sanctum::actingAs(
             User::factory()->create()
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Bermain',
             'profile' => $profile,
             'address' => 'Jakarta Selatan',
             'bio' => 'Perusahaan terbaik di jakarta raya',
-            'email' => 'sobatkerja3@gmail.com',
+            'email' => 'sobatbermain@gmail.com',
             'contact' => '081287127817271'
         ]);
         $time = time();
@@ -182,9 +187,9 @@ class CompanyControllerTest extends TestCase
             ]
         ]);
         $this->assertDatabaseMissing('companies', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Bermain',
             'address' => 'Jakarta Selatan',
-            'email' => 'sobatkerja3@gmail.com',
+            'email' => 'sobatbermain@gmail.com',
             'contact' => '081287127817271',
             'profile' => '/Company/Profile/' . $time . $fileName,
             'bio' => 'Perusahaan terbaik di jakarta raya',
@@ -195,13 +200,14 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
+    // Test Create Company Without Email Field
     public function test_create_company_without_email_field(){
         Sanctum::actingAs(
             User::factory()->create()
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Belajar',
             'profile' => $profile,
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
@@ -223,7 +229,7 @@ class CompanyControllerTest extends TestCase
             ]
         ]);
         $this->assertDatabaseMissing('companies', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Belajar',
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
             'contact' => '081287127817271',
@@ -236,18 +242,19 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
+    // Test Create Company Without Contact Field
     public function test_create_company_without_contact_field(){
         Sanctum::actingAs(
             User::factory()->create()
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Dagang',
             'profile' => $profile,
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
             'bio' => 'Perusahaan terbaik di jakarta raya',
-            'email' => 'sobatkerja3@gmail.com',
+            'email' => 'sobatdagang@gmail.com',
         ]);
         $time = time();
         $fileName = $profile->getClientOriginalName();
@@ -264,10 +271,10 @@ class CompanyControllerTest extends TestCase
             ]
         ]);
         $this->assertDatabaseMissing('companies', [
-            'name' => 'Sobat Kerja',
+            'name' => 'Sobat Dagang',
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
-            'email' => 'sobatkerja3@gmail.com',
+            'email' => 'sobatdagang@gmail.com',
             'profile' => '/Company/Profile/' . $time . $fileName,
             'bio' => 'Perusahaan terbaik di jakarta raya',
         ]);
@@ -275,5 +282,202 @@ class CompanyControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'company_id' => 2
         ]);
+    }
+
+    // Test Create Company With Invalid Email Format
+    public function test_create_company_with_invalid_email_format(){
+        Sanctum::actingAs(
+            User::factory()->create()
+        );
+
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+        $response = $this->postJson('/api/company', [
+            'name' => 'Sobat Jualan',
+            'profile' => $profile,
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'contact' => '081287127817271',
+            'email' => 'sobatjualan@gmail',
+        ]);
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
+
+        $response->assertStatus(422)->assertExactJson([
+            'meta' => [
+                'code' => 422,
+                'status' => 'error',
+                'message' => 'Unprocessable Entity'
+            ],
+            'data' => null,
+            'errors' => [
+                'email' => ['The email must be a valid email address.']
+            ]
+        ]);
+        $this->assertDatabaseMissing('companies', [
+            'name' => 'Sobat Jualan',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'sobatjualan@gmail',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+        $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
+        $this->assertDatabaseMissing('users', [
+            'company_id' => 2
+        ]);
+    }
+
+    // Test Create Company With Duplicate Email
+    public function test_create_company_with_duplicate_email(){
+        Sanctum::actingAs(
+            User::factory()->create()
+        );
+
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+        $profile1 = UploadedFile::fake()->image('company_profile134.jpg');
+
+        $response = $this->postJson('/api/company', [
+            'name' => 'Travi',
+            'profile' => $profile,
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'travi@gmail.com',
+            'contact' => '081287127817271'
+        ]);
+
+        $response1 = $this->postJson('/api/company', [
+            'name' => 'Travi1',
+            'profile' => $profile1,
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'contact' => '081287127817271',
+            'email' => 'travi@gmail.com',
+        ]);
+
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
+        $fileName1 = $profile1->getClientOriginalName();
+
+        $response1->assertStatus(422)->assertExactJson([
+            'meta' => [
+                'code' => 422,
+                'status' => 'error',
+                'message' => 'Unprocessable Entity'
+            ],
+            'data' => null,
+            'errors' => [
+                'email' => [
+                    'The email has already been taken.'
+                ]
+            ]
+        ]);
+
+        $this->assertDatabaseHas('companies', [
+            'name' => 'Travi',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'travi@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertDatabaseMissing('companies', [
+            'name' => 'Travi1',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'travi@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertFileExists(public_path() . '/Company/Profile/' . $time . $fileName);
+        $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
+        $this->assertDatabaseMissing('users', [
+            'company_id' => 8
+        ]);
+
+        unlink(public_path() . '/Company/Profile/' . $time . $fileName);
+    }
+
+    // Test Create Company With Duplicate Email
+    public function test_create_company_with_duplicate_name(){
+        Sanctum::actingAs(
+            User::factory()->create()
+        );
+
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+        $profile1 = UploadedFile::fake()->image('company_profile134.jpg');
+
+        $response = $this->postJson('/api/company', [
+            'name' => 'KitFood',
+            'profile' => $profile,
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'kitfood@gmail.com',
+            'contact' => '081287127817271'
+        ]);
+
+        $response1 = $this->postJson('/api/company', [
+            'name' => 'KitFood',
+            'profile' => $profile1,
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'contact' => '081287127817271',
+            'email' => 'kitfood1@gmail.com',
+        ]);
+
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
+        $fileName1 = $profile1->getClientOriginalName();
+
+        $response1->assertStatus(422)->assertExactJson([
+            'meta' => [
+                'code' => 422,
+                'status' => 'error',
+                'message' => 'Unprocessable Entity'
+            ],
+            'data' => null,
+            'errors' => [
+                'name' => [
+                    'The name has already been taken.'
+                ]
+            ]
+        ]);
+
+        $this->assertDatabaseHas('companies', [
+            'name' => 'KitFood',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'kitfood@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertDatabaseMissing('companies', [
+            'name' => 'KitFood',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'kitfood1@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertFileExists(public_path() . '/Company/Profile/' . $time . $fileName);
+        $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
+        $this->assertDatabaseMissing('users', [
+            'company_id' => 10
+        ]);
+
+        unlink(public_path() . '/Company/Profile/' . $time . $fileName);
     }
 }

@@ -14,10 +14,10 @@ class CompanyController extends Controller
 {
     private function makeValidator(Request $request){
         return Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|unique:companies',
             'address' => 'required',
             'category' => 'required',
-            'email' => 'required',
+            'email' => 'required|email:dns|unique:companies',
             'contact' => 'required'
         ]);
     }
