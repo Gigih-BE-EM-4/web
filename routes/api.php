@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('user/register', [UserController::class, 'register']);
 Route::post('user/login', [UserController::class, 'login'])->name("user");
 Route::get('notAuthenticated', [App\Http\Controllers\ErrorController::class, 'notAuthenticated'])->name("notAuthenticated");
+Route::get('user/verify/{verify}', [UserController::class, 'verify'])->name("user.verify");
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -33,6 +34,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum','isVerify'])->group(function () {
     Route::post('user', [UserController::class, 'update'])->name("user.update");
 });
+
+
 
 
 

@@ -100,4 +100,15 @@ class UserController extends Controller
             return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
         }
     }
+
+    public function verify($verify){
+        $user = User::where('verify', $verify)->first();
+        if($user){
+            $user->verify = null;
+            $user->save();
+            return ResponseFormatter::success($user, "user has been verified", 201, 'success');
+        }else{
+            return ResponseFormatter::error(null, "User not found", 404, "user not found");
+        }
+    }
 }
