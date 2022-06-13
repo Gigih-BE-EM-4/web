@@ -6,9 +6,9 @@ class ResponseFormatter
 {
     protected static $response = [
         'meta' => [
-        'code' => 200,
-        'status' => 'success',
-        'message' => null
+            'code' => 200,
+            'status' => 'success',
+            'message' => null
         ],
         'data' => null
     ];
@@ -23,7 +23,7 @@ class ResponseFormatter
         return response()->json(self::$response, self::$response['meta']['code']);
     }
 
-    public static function error($data = null, $message = null, $code = 400, $status = 'error')
+    public static function error($data = null, $message = null, $code = 400, $errors)
     {
         self::$response['meta']['status'] = 'error';
         self::$response['meta']['code'] = $code;
