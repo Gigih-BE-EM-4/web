@@ -53,11 +53,7 @@ class UserController extends Controller
             if(Auth::attempt(['email'=> $request->username, 'password'=>$request->password]) || Auth::attempt(['username'=> $request->username, 'password'=>$request->password])){
                 $user = Auth::user();
                 $token = $user->createToken('CPToken')->plainTextToken;
-                return response()->json([
-                    "message" => "User logged in successfully",
-                    "token" => $token,
-                    "user" => $user
-                ], 200);
+                return ResponseFormatter::success(["token"=>$token], "user has been logged in", 201, 'success');
             }else{
                 return ResponseFormatter::error(null, "User not authenticated", 401, "user/password not match");
             }
