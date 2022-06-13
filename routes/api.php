@@ -27,16 +27,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/company', [CompanyController::class, 'store']);
 });
 
-Route::group(function(){
+// Route::group(function(){
 
-    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-        return $request->user();
-    });
+//     Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//         return $request->user();
+//     });
 
-    Route::middleware('isAdmin')->get('/user', function (Request $request) {
-        return $request->user();
-    });
-})->name("user");
+//     Route::middleware('isAdmin')->get('/user', function (Request $request) {
+//         return $request->user();
+//     });
+// })->name("user");
 
 
 
