@@ -6,6 +6,8 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+use function PHPSTORM_META\type;
+
 class CompanyController extends Controller
 {
     private function makeValidator(Request $request){
@@ -32,14 +34,16 @@ class CompanyController extends Controller
     }
 
     public function store(Request $request){
-        $request['profile'] = $this->uploadImage($request);
         $validator = $this->makeValidator($request);
 
         if($validator->fails()){
             ResponseFormatter::error(null, "Unprocessable Entity", 422, $validator->errors());
         }
 
-        $company = Company::create($validator->validated());
-        ResponseFormatter::success($company->toArray(), "Success Created Company", 201);
+        $request['profile'] = $this->uploadImage($request);
+
+        Company::create($request->toArray());
+        dd(Company::all());
+        ResponseFormatter::success(null, "Success Created Company", 201, 'success');
     }
 }
