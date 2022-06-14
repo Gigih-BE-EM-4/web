@@ -16,7 +16,6 @@ class CompanyFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
-            'profile' => UploadedFile::fake()->image('company_image.jpg'),
             'bio' => $this->faker->text(100),
             'address' => $this->faker->streetAddress() . "," . $this->faker->city() . "," . $this->faker->country(),
             'email' => $this->faker->companyEmail(),

@@ -19,6 +19,7 @@ class ResponseFormatter
         self::$response['meta']['code'] = $code;
         self::$response['meta']['status'] = $status;
         self::$response['data'] = $data;
+        self::$response['errors'] = null;
 
         return response()->json(self::$response, self::$response['meta']['code']);
     }

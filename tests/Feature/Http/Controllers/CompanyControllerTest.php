@@ -54,7 +54,8 @@ class CompanyControllerTest extends TestCase
                 'contact' => '081287127817271',
                 'profile' => '/Company/Profile/' . $time . $fileName,
                 'bio' => 'Perusahaan terbaik di jakarta raya',
-            ]
+            ],
+            'errors' => null
         ]);
         $this->assertFileExists(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseHas('companies', [
@@ -344,12 +345,13 @@ class CompanyControllerTest extends TestCase
 
     // Test Create Company With Duplicate Email
     public function test_create_company_with_duplicate_email(){
-        Sanctum::actingAs(
-            User::factory()->create()
-        );
-
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $profile1 = UploadedFile::fake()->image('company_profile134.jpg');
+
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
 
         $response = $this->postJson('/api/company', [
             'name' => 'Travi',
@@ -360,6 +362,11 @@ class CompanyControllerTest extends TestCase
             'email' => 'travi@gmail.com',
             'contact' => '081287127817271'
         ]);
+
+        $user1 = User::factory()->create();
+        Sanctum::actingAs(
+            $user1
+        );
 
         $response1 = $this->postJson('/api/company', [
             'name' => 'Travi1',
@@ -413,9 +420,11 @@ class CompanyControllerTest extends TestCase
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
 
         $this->assertDatabaseHas('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
         $this->assertDatabaseMissing('users', [
+            'id' => $user1->id,
             'company_id' => 3
         ]);
 
@@ -424,12 +433,14 @@ class CompanyControllerTest extends TestCase
 
     // Test Create Company With Duplicate Name
     public function test_create_company_with_duplicate_name(){
-        Sanctum::actingAs(
-            User::factory()->create()
-        );
 
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $profile1 = UploadedFile::fake()->image('company_profile134.jpg');
+
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
 
         $response = $this->postJson('/api/company', [
             'name' => 'KitFood',
@@ -441,6 +452,10 @@ class CompanyControllerTest extends TestCase
             'contact' => '081287127817271'
         ]);
 
+        $user1 = User::factory()->create();
+        Sanctum::actingAs(
+            $user1
+        );
         $response1 = $this->postJson('/api/company', [
             'name' => 'KitFood',
             'profile' => $profile1,
@@ -493,16 +508,18 @@ class CompanyControllerTest extends TestCase
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
 
         $this->assertDatabaseHas('users', [
+            'id' => $user->id,
             'company_id' => 3
         ]);
         $this->assertDatabaseMissing('users', [
+            'id' => $user1->id,
             'company_id' => 4
         ]);
 
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
     }
 
-    // Test Create Company With Duplicate Name
+    // Test Create Company With Unauthenticated User
     public function test_create_company_with_unauthenticated_user(){
 
         $profile = UploadedFile::fake()->image('company_profile.jpg');
@@ -545,4 +562,14 @@ class CompanyControllerTest extends TestCase
             'company_id' => 4
         ]);
     }
+
+    // public function test_aja(){
+    //     $user1 = User::factory()->create();
+    //     Sanctum::actingAs(
+    //         $user1
+    //     );
+    //     $newResponse = $this->get('/api/company/100');
+
+    //     $newResponse->dd();
+    // }
 }

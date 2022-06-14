@@ -54,4 +54,14 @@ class CompanyController extends Controller
     
         return ResponseFormatter::success($validatedData, "Company has been created", 201, 'success');
     }
+
+    public function companyDetail($company_id){
+        // return response()->json([
+        //     'company_id' => $company_id 
+        // ]);
+
+        $company = Company::where('id', $company_id)->first();
+
+        return ResponseFormatter::success($company, "Success Get Company Detail", 200, 'success');
+    }
 }
