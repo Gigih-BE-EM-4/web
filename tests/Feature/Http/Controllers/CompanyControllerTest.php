@@ -579,6 +579,7 @@ class CompanyControllerTest extends TestCase
         $user1 = User::factory()->create([
             'company_id' => $company->id
         ]);
+        
         Sanctum::actingAs(
             $user1
         );
@@ -592,6 +593,40 @@ class CompanyControllerTest extends TestCase
                 'message' => 'Success Get Company Detail'
             ],
             'data' => $company->toArray(),
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_company_detail_with_incorrect_company_id(){
+        $company = Company::factory()->create([
+            'id' => 102,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        Company::factory()->create([
+            'id' => 103,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company2.jpg'
+        ]);
+
+        $user = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+        
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->get('/api/company/500');
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get Company Detail'
+            ],
+            'data' => null,
             'errors' => null
         ]);
     }

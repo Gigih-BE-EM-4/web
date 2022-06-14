@@ -30,10 +30,12 @@ class Company extends Model
     }
 
     public static function getCompanyDetail($company_id){
-        return User::where([
-            ['id', '=', Auth::user()->id],
-            ['company_id', '=', $company_id]
-        ])->first()->company;
+
+        if( User::where([['id', '=', Auth::user()->id],['company_id', '=', $company_id]])->first() == null){
+            return null;
+        }else{
+            return User::where([['id', '=', Auth::user()->id],['company_id', '=', $company_id]])->first()->company;
+        }
     }
 
 }
