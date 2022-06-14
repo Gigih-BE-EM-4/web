@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Company extends Model
 {
@@ -26,6 +27,13 @@ class Company extends Model
     public function projects()
     {
         return $this->hasMany('App\Models\Project');
+    }
+
+    public static function getCompanyDetail($company_id){
+        return User::where([
+            ['id', '=', Auth::user()->id],
+            ['company_id', '=', $company_id]
+        ])->first()->company;
     }
 
 }

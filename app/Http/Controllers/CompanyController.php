@@ -56,12 +56,7 @@ class CompanyController extends Controller
     }
 
     public function companyDetail($company_id){
-        // return response()->json([
-        //     'company_id' => $company_id 
-        // ]);
-
-        $company = Company::where('id', $company_id)->first();
-
+        $company = Company::getCompanyDetail($company_id);
         return ResponseFormatter::success($company, "Success Get Company Detail", 200, 'success');
     }
 }

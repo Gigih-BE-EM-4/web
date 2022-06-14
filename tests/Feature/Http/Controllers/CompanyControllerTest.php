@@ -563,13 +563,36 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
-    // public function test_aja(){
-    //     $user1 = User::factory()->create();
-    //     Sanctum::actingAs(
-    //         $user1
-    //     );
-    //     $newResponse = $this->get('/api/company/100');
+    public function test_get_company_detail_with_correct_company_id(){
+        $company = Company::factory()->create([
+            'id' => 100,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
 
-    //     $newResponse->dd();
-    // }
+        Company::factory()->create([
+            'id' => 101,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company2.jpg'
+        ]);
+
+        $user1 = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+        Sanctum::actingAs(
+            $user1
+        );
+
+        $response = $this->get('/api/company/100');
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get Company Detail'
+            ],
+            'data' => $company->toArray(),
+            'errors' => null
+        ]);
+    }
 }
