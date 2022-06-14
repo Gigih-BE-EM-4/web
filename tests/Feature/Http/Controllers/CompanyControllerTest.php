@@ -67,6 +67,7 @@ class CompanyControllerTest extends TestCase
             'bio' => 'Perusahaan terbaik di jakarta raya',
         ]);
         $this->assertDatabaseHas('users', [
+            'id' => $user->id,
             'company_id' => 1
         ]);
         $this->assertDatabaseCount('companies', 1);
@@ -75,8 +76,9 @@ class CompanyControllerTest extends TestCase
 
     // Test Create Company Without Name Field
     public function test_create_company_without_name_field(){
+        $user = User::factory()->create();
         Sanctum::actingAs(
-            User::factory()->create()
+            $user
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
@@ -112,14 +114,16 @@ class CompanyControllerTest extends TestCase
         ]);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
     }
 
     // Test Create Company Without Address Field
     public function test_create_company_without_address_field(){
+        $user = User::factory()->create();
         Sanctum::actingAs(
-            User::factory()->create()
+            $user
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
@@ -154,14 +158,16 @@ class CompanyControllerTest extends TestCase
         ]);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
     }
 
     // Test Create Company Without Category Field
     public function test_create_company_without_category_field(){
+        $user = User::factory()->create();
         Sanctum::actingAs(
-            User::factory()->create()
+            $user
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
@@ -196,14 +202,16 @@ class CompanyControllerTest extends TestCase
         ]);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
     }
 
     // Test Create Company Without Email Field
     public function test_create_company_without_email_field(){
+        $user = User::factory()->create();
         Sanctum::actingAs(
-            User::factory()->create()
+            $user
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
@@ -238,14 +246,16 @@ class CompanyControllerTest extends TestCase
         ]);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
     }
 
     // Test Create Company Without Contact Field
     public function test_create_company_without_contact_field(){
+        $user = User::factory()->create();
         Sanctum::actingAs(
-            User::factory()->create()
+            $user
         );
         $profile = UploadedFile::fake()->image('company_profile.jpg');
         $response = $this->postJson('/api/company', [
@@ -280,14 +290,16 @@ class CompanyControllerTest extends TestCase
         ]);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
     }
 
     // Test Create Company With Invalid Email Format
     public function test_create_company_with_invalid_email_format(){
+        $user = User::factory()->create();
         Sanctum::actingAs(
-            User::factory()->create()
+            $user
         );
 
         $profile = UploadedFile::fake()->image('company_profile.jpg');
@@ -325,6 +337,7 @@ class CompanyControllerTest extends TestCase
         ]);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
+            'id' => $user->id,
             'company_id' => 2
         ]);
     }
@@ -398,8 +411,12 @@ class CompanyControllerTest extends TestCase
 
         $this->assertFileExists(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
+
+        $this->assertDatabaseHas('users', [
+            'company_id' => 2
+        ]);
         $this->assertDatabaseMissing('users', [
-            'company_id' => 8
+            'company_id' => 3
         ]);
 
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
@@ -474,8 +491,12 @@ class CompanyControllerTest extends TestCase
 
         $this->assertFileExists(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
+
+        $this->assertDatabaseHas('users', [
+            'company_id' => 3
+        ]);
         $this->assertDatabaseMissing('users', [
-            'company_id' => 10
+            'company_id' => 4
         ]);
 
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
@@ -521,7 +542,7 @@ class CompanyControllerTest extends TestCase
 
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
-            'company_id' => 11
+            'company_id' => 4
         ]);
     }
 }
