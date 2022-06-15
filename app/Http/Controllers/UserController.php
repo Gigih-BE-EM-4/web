@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Validator;
 use Illuminate\Support\Facades\Auth;
@@ -61,6 +62,20 @@ class UserController extends Controller
             'confirm_password' => 'required|same:password',
         ]);
     }
+
+
+    private function uploadImage($request){
+        if($file = $request->hasFile('profile')) {
+            $file = $request->file('profile') ;
+            $fileName = $file->getClientOriginalName() ;
+            $destinationPath = public_path().'/User/Profile';
+            $now = Carbon::now();
+            $file->move($destinationPath,$now . $fileName);
+            return "/User/Profile/" . $now . $fileName;
+        }else {
+            return "";
+        }
+    }
     
     public function login (Request $request){
         $validate = $this->loginValidator($request);
@@ -81,6 +96,7 @@ class UserController extends Controller
     public function update (Request $request){
         $validate = $this->updateValidator($request);
         if(!$validate->fails()){
+            $request->merge(['profile' => $this->uploadImage($request)]);
             if(isset($request->password)){
                 $pwValidate = $this->confirmPasswordValidator($request);
                 if(!$pwValidate->fails()){
