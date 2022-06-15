@@ -155,6 +155,54 @@ class UserControllerTest extends TestCase
         $responseLogin->assertStatus(401);
 
     }
+    public function test_register_with_invalid_username_field(){
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The username field is required.",$content["errors"]["username"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.com',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+
+        //username under 5 character
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifa',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The username must be at least 5 characters.",$content["errors"]["username"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.com',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+    }
+
 
     
 
