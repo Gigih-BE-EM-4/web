@@ -88,4 +88,18 @@ class CompanyController extends Controller
 
         return ResponseFormatter::success(null, "Success Leave Company", 200, 'success');
     }
+
+    public function companyMembers($company_id){
+        $company = Company::find($company_id);
+
+        if($company == null){
+            return ResponseFormatter::success(null, "Company Not Found", 200, 'success');
+        }
+
+        if($company->id != Auth::user()->company_id){
+            return ResponseFormatter::error(null, "Unauthorized User", 401, 'Unauthorized.');
+        }
+
+        return ResponseFormatter::success($company->users, "Success Get Company Members", 200, 'success');
+    }
 }

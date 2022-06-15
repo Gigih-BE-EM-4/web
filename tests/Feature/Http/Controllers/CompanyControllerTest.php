@@ -962,11 +962,17 @@ class CompanyControllerTest extends TestCase
         ]);
 
         $user = User::factory()->create([
-            'company_id' => $company->id
+            'company_id' => (string)$company->id,
+            'bio' => 'Seorang pelajar yang tangguh',
+            'last_education' => 'Sekolah Menangah Atas',
+            'profile' => 'gambar.jpg'
         ]);
 
         $user1 = User::factory()->create([
-            'company_id' => $company->id
+            'company_id' =>(string)$company->id,
+            'bio' => 'Seorang pelajar yang tangguh',
+            'last_education' => 'Sekolah Menangah Pertama',
+            'profile' => 'gambar.jpg'
         ]);
 
         Sanctum::actingAs(
