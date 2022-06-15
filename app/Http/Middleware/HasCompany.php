@@ -2,11 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Controllers\ResponseFormatter;
 use Closure;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
-class isVerify
+class HasCompany
 {
   /**
    * Handle an incoming request.
@@ -17,10 +18,9 @@ class isVerify
    */
   public function handle(Request $request, Closure $next)
   {
-    if (Auth::User()->verify != null) {
-      return redirect()->route('notAuthenticated');
-    } else {
-      return $next($request);
+    if (Auth::user()->company_id == null) {
+      return ResponseFormatter::error(null, "User not have company", 400, "internal error");
     }
+    return $next($request);
   }
 }

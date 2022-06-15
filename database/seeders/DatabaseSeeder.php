@@ -82,8 +82,8 @@ class DatabaseSeeder extends Seeder
     //     "contact" => "081938713808"
     // ]);
 
-    Company::factory()->count(10)->create();
-    Project::factory()->count(10)->create();
+    Company::factory()->count(3)->create();
+    Project::factory()->count(20)->create();
     $this->call([
 
       UserSeeder::class,
