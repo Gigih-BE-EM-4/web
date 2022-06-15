@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class CompanyProjectController extends Controller
@@ -44,10 +46,11 @@ class CompanyProjectController extends Controller
 
     if ($request->hasFile('image')) {
       $file = $request->file('image');
-      $file->move(public_path('images/project'), $file->getClientOriginalName());
-      $validatedData['images'] =  public_path("images\project\\" . $file->getClientOriginalName());
+      $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
+      $file->move(public_path('images/project'), $fileName);
+      $validatedData['images'] =  "\images\project\\" . $fileName;
     } else {
-      $validatedData['images'] =  public_path("images\project\\" . "default.png");
+      $validatedData['images'] =  "\images\project\\" . "default.png";
     }
 
     $validatedData["company_id"] = 0;
@@ -55,6 +58,41 @@ class CompanyProjectController extends Controller
     $project = Project::create($validatedData);
 
     return ResponseFormatter::success(Project::find($project->id), "Project has been created");
+  }
+
+  public function updateProject(Request $request, $id)
+  {
+
+    $validator = Validator::make($request->all(), [
+      'name' => 'required',
+      'description' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+      return ResponseFormatter::error(null, 'Validation Error', 400, $validator->errors());
+    }
+
+    $validatedData = $validator->validated();
+
+    $project = Project::find($id);
+
+    if ($project) {
+      if ($request->hasFile('image')) {
+        File::exists(public_path() . $project->images) && $project->images != '/images/project/default.png' ? File::delete(public_path() . $project->images) : '';
+        $file = $request->file('image');
+        $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('images/project'), $fileName);
+        $validatedData['images'] =  "\images\project\\" . $fileName;
+      } else {
+        $validatedData['images'] =  "\images\project\\" . "default.png";
+      }
+
+      $project->update($validatedData);
+
+      return ResponseFormatter::success(Project::find($project->id), "Project has been updated");
+    } else {
+      return ResponseFormatter::error(null, "Project not found", 404, "Project {$id} not found");
+    }
   }
 
   public function getAllApplicants(Request $request)
