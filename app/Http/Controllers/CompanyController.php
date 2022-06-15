@@ -48,9 +48,9 @@ class CompanyController extends Controller
         
         $company = Company::create($validatedData);
 
-        User::find(Auth::user()->id)->update([
-            'company_id' => $company->id
-        ]);
+        $user = Auth::user();
+        $user->company_id = $company->id;
+        $user->save();
     
         return ResponseFormatter::success($validatedData, "Company has been created", 201, 'success');
     }
@@ -79,5 +79,13 @@ class CompanyController extends Controller
             'company_id' => $company->id
         ]);
         return ResponseFormatter::success(['user name' => $newCompanyMember->name, 'company name' => $company->name], "Success Getting Other People Into The Company", 200, 'success');
+    }
+
+    public function leaveCompany(){
+        $user = Auth::user();
+        $user->company_id = null;
+        $user->save();
+
+        return ResponseFormatter::success(null, "Success Leave Company", 200, 'success');
     }
 }
