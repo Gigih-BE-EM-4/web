@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\Validator;
 
 class CompanyProjectController extends Controller
 {
@@ -24,8 +25,39 @@ class CompanyProjectController extends Controller
       }
     }
 
-    $project = Project::with(['company']);
+    $project = Project::with(['company'])->latest();
 
     return ResponseFormatter::success($project->paginate($limit), "Data Successfully Retrieved");
+  }
+
+  public function createProject(Request $request)
+  {
+    $validator = Validator::make($request->all(), [
+      'name' => 'required',
+      'description' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+      return ResponseFormatter::error(null, 'Validation Error', 400, $validator->errors());
+    }
+    $validatedData = $validator->validated();
+
+    if ($request->hasFile('image')) {
+      $file = $request->file('image');
+      $file->move(public_path('images/project'), $file->getClientOriginalName());
+      $validatedData['images'] =  public_path("images\project\\" . $file->getClientOriginalName());
+    } else {
+      $validatedData['images'] =  public_path("images\project\\" . "default.png");
+    }
+
+    $validatedData["company_id"] = 0;
+
+    $project = Project::create($validatedData);
+
+    return ResponseFormatter::success(Project::find($project->id), "Project has been created");
+  }
+
+  public function getAllApplicants(Request $request)
+  {
   }
 }

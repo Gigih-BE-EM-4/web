@@ -40,4 +40,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
 });
 
-Route::get('user/company/projects', [CompanyProjectController::class, 'getAllProjects'])->name("user.company.projects");
+Route::middleware('auth:sanctum')->group(function () {
+  Route::get('user/company/projects', [CompanyProjectController::class, 'getAllProjects'])->name("user.company.projects");
+  Route::post('company/project', [CompanyProjectController::class, 'createProject'])->name("user.company.project.create")->middleware('auth:sanctum');
+  Route::patch('company/project', [CompanyProjectController::class, 'createProject'])->name("user.company.project.create")->middleware('auth:sanctum');
+  Route::get('company/project/{project_id}/role/{role_id}/applicants', [CompanyProjectController::class, 'getAllApplicants'])->name("user.company.applicants");
+});
