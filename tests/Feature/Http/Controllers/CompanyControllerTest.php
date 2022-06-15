@@ -725,18 +725,18 @@ class CompanyControllerTest extends TestCase
             'profile' => '/Company/Profile/company1.jpg'
         ]);
 
-        $newCompanyUser = User::factory()->create();
+        $newCompanyMember = User::factory()->create();
 
-        $oldCompanyUser = User::factory()->create([
+        $oldCompanyMember = User::factory()->create([
             'company_id' => $company->id
         ]);
         Sanctum::actingAs(
-            $oldCompanyUser
+            $oldCompanyMember
         );
 
         $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
-            'user_id' => $newCompanyUser->id
+            'user_id' => $newCompanyMember->id
         ]);
 
         $response->assertOk()->assertExactJson([
@@ -746,14 +746,14 @@ class CompanyControllerTest extends TestCase
                 'message' => 'Success Getting Other People Into The Company'
             ],
             'data' => [
-                'user name' => $newCompanyUser->name,
+                'user name' => $newCompanyMember->name,
                 'company name' => $company->name
             ],
             'errors' => null
         ]);
 
         $this->assertDatabaseHas('users', [
-            'id' => $newCompanyUser->id,
+            'id' => $newCompanyMember->id,
             'company_id' => $company->id
         ]);
     }
@@ -765,19 +765,19 @@ class CompanyControllerTest extends TestCase
             'profile' => '/Company/Profile/company1.jpg'
         ]);
 
-        $newCompanyUser = User::factory()->create();
+        $newCompanyMember = User::factory()->create();
 
-        $oldCompanyUser = User::factory()->create([
+        $oldCompanyMember = User::factory()->create([
             'company_id' => $company->id
         ]);
 
         Sanctum::actingAs(
-            $oldCompanyUser
+            $oldCompanyMember
         );
 
         $response = $this->post('/api/company/join', [
             'company_id' => 300,
-            'user_id' => $newCompanyUser->id
+            'user_id' => $newCompanyMember->id
         ]);
 
         $response->assertOk()->assertExactJson([
@@ -791,7 +791,7 @@ class CompanyControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('users', [
-            'id' => $newCompanyUser->id,
+            'id' => $newCompanyMember->id,
             'company_id' => $company->id
         ]);
     }
@@ -803,14 +803,14 @@ class CompanyControllerTest extends TestCase
             'profile' => '/Company/Profile/company1.jpg'
         ]);
 
-        $newCompanyUser = User::factory()->create();
+        $newCompanyMember = User::factory()->create();
 
-        $oldCompanyUser = User::factory()->create([
+        $oldCompanyMember = User::factory()->create([
             'company_id' => $company->id
         ]);
 
         Sanctum::actingAs(
-            $oldCompanyUser
+            $oldCompanyMember
         );
 
         $response = $this->post('/api/company/join', [
@@ -829,7 +829,7 @@ class CompanyControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('users', [
-            'id' => $newCompanyUser->id,
+            'id' => $newCompanyMember->id,
             'company_id' => $company->id
         ]);
     }
@@ -841,9 +841,9 @@ class CompanyControllerTest extends TestCase
             'profile' => '/Company/Profile/company1.jpg'
         ]);
 
-        $newCompanyUser = User::factory()->create();
+        $newCompanyMember = User::factory()->create();
 
-        $unauthorizedUser = User::factory()->create();
+        $unauthorizedCompanyMember = User::factory()->create();
 
         // old company user
         User::factory()->create([
@@ -851,12 +851,12 @@ class CompanyControllerTest extends TestCase
         ]);
 
         Sanctum::actingAs(
-            $unauthorizedUser
+            $unauthorizedCompanyMember
         );
 
         $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
-            'user_id' => $newCompanyUser->id
+            'user_id' => $newCompanyMember->id
         ]);
 
         $response->assertStatus(401)->assertExactJson([
@@ -870,7 +870,7 @@ class CompanyControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('users', [
-            'id' => $newCompanyUser->id,
+            'id' => $newCompanyMember->id,
             'company_id' => $company->id
         ]);
     }
@@ -882,11 +882,11 @@ class CompanyControllerTest extends TestCase
             'profile' => '/Company/Profile/company1.jpg'
         ]);
 
-        $newCompanyUser = User::factory()->create();
+        $newCompanyMember = User::factory()->create();
 
         $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
-            'user_id' => $newCompanyUser->id
+            'user_id' => $newCompanyMember->id
         ]);
 
         $response->assertStatus(401)->assertExactJson([
@@ -900,7 +900,7 @@ class CompanyControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseMissing('users', [
-            'id' => $newCompanyUser->id,
+            'id' => $newCompanyMember->id,
             'company_id' => $company->id
         ]);
     }

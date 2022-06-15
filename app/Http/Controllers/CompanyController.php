@@ -62,22 +62,22 @@ class CompanyController extends Controller
 
     public function joinCompany(Request $request){
         $company = Company::find($request->company_id);
-        $newUserCompany = User::find($request->user_id);
+        $newCompanyMember = User::find($request->user_id);
 
         if($company == null){
             return ResponseFormatter::success(null, "Company Not Found", 200, 'success');
         }
 
-        if($newUserCompany == null){
+        if($newCompanyMember == null){
             return ResponseFormatter::success(null, "User Not Found", 200, 'success');
         }
 
         if(Auth::user()->company_id != $company->id){
             return ResponseFormatter::error(null, "Unauthorized User", 401, 'Unauthorized.');
         }
-        $newUserCompany->update([
+        $newCompanyMember->update([
             'company_id' => $company->id
         ]);
-        return ResponseFormatter::success(['user name' => $newUserCompany->name, 'company name' => $company->name], "Success Getting Other People Into The Company", 200, 'success');
+        return ResponseFormatter::success(['user name' => $newCompanyMember->name, 'company name' => $company->name], "Success Getting Other People Into The Company", 200, 'success');
     }
 }
