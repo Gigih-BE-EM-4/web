@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanyProjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,33 +24,20 @@ Route::get('user/verify/{verify}', [UserController::class, 'verify'])->name("use
 Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/company/{company_id}', [CompanyController::class, 'companyDetail']);
-    Route::post('/company', [CompanyController::class, 'store']);
+  Route::get('/company/{company_id}', [CompanyController::class, 'companyDetail']);
+  Route::post('/company', [CompanyController::class, 'store']);
 });
 
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('user', [UserController::class, 'update'])->name("user.update");
-    Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
-    Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
-
+  Route::post('user', [UserController::class, 'update'])->name("user.update");
+  Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
+  Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Route::get('user/company/projects', [CompanyProjectController::class, 'getAllProjects'])->name("user.company.projects");
