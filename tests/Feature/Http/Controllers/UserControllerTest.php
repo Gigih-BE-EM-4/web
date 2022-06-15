@@ -203,6 +203,111 @@ class UserControllerTest extends TestCase
         $responseLogin->assertStatus(401);
     }
 
+    public function test_register_with_invalid_address_field(){
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The address field is required.",$content["errors"]["address"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.com',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+    }
+
+    public function test_register_with_invalid_password(){
+        //without password field
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'address' => 'Jakarta',
+            'username' => 'rifaldy',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The password field is required.",$content["errors"]["password"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+        //password field under 8 character
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'address' => 'Jakarta',
+            'username' => 'rifaldy',
+            'password' => '12345',
+            'confirm_password' => '12345',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The password must be at least 8 characters.",$content["errors"]["password"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+
+        //without confirm password field
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'address' => 'Jakarta',
+            'username' => 'rifaldy',
+            'confirm' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The confirm password field is required.",$content["errors"]["confirm_password"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+
+        //without confirm password field
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'address' => 'Jakarta',
+            'username' => 'rifaldy',
+            'confirm' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The confirm password and password must match.",$content["errors"]["confirm_password"], );
+        $this->assertDatabaseMissing('users', [
+            'email' => 'rifaldy@gmail.com',
+        ]);
+    }
+
 
     
 
