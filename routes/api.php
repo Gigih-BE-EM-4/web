@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanyProjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,7 +24,7 @@ Route::get('user/verify/{verify}', [UserController::class, 'verify'])->name("use
 Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -35,22 +36,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('user', [UserController::class, 'update'])->name("user.update");
-    Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
-    Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
-
+  Route::post('user', [UserController::class, 'update'])->name("user.update");
+  Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
+  Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Route::middleware('auth:sanctum')->group(function () {
+  Route::get('user/company/projects', [CompanyProjectController::class, 'getAllProjects'])->name("user.company.projects");
+  Route::post('company/project', [CompanyProjectController::class, 'createProject']);
+  Route::post('company/project/{id}', [CompanyProjectController::class, 'updateProject']);
+  Route::get('company/project/{project_id}/role/{role_id}/applicants', [CompanyProjectController::class, 'getAllApplicants'])->name("user.company.applicants");
+});
