@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
            "last_education" => "SMK",
            "company_id" => "",
            "verify" => "asdawdawdawdasdaw",
-           "password" => "12345678",
+           "password" => bcrypt("12345678"),
        ]);
        User::insert([
         "name" => "user1",
@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
         "last_education" => "SMK",
         "company_id" => "",
         "verify" => "asdawdawdawdasdaw",
-        "password" => "12345678",
+        "password" => bcrypt("12345678"),
     ]);
     User::insert([
         "name" => "user2",
@@ -48,7 +48,7 @@ class UserSeeder extends Seeder
         "last_education" => "SMK",
         "company_id" => "",
         "verify" => "asdawdawdawdasdaw",
-        "password" => "12345678",
+        "password" => bcrypt("12345678"),
     ]);
     User::insert([
         "name" => "user3",
@@ -60,7 +60,7 @@ class UserSeeder extends Seeder
         "last_education" => "SMK",
         "company_id" => "",
         "verify" => "asdawdawdawdasdaw",
-        "password" => "12345678",
+        "password" => bcrypt("12345678"),
     ]);
     }
 }
