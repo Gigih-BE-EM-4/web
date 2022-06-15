@@ -44,8 +44,9 @@ class UserControllerTest extends TestCase
         $responseLogin->assertStatus(201);
     }
 
-    public function test_register_without_name_field()
+    public function test_register_with_invalid_name_field()
     {
+        //without name
         $response = $this->postJson('/api/user/register', [
             'email' => 'rifaldy@gmail.com',
             'username' => 'rifaldy',
@@ -54,9 +55,8 @@ class UserControllerTest extends TestCase
             'confirm_password' => 'rifaldi111',
         ]);
         $content = $response->decodeResponseJson();
-
         $response->assertStatus(422);
-        $this->assertEquals($content["errors"]["name"][0], "The name field is required.");
+        $this->assertContains("The name field is required.",$content["errors"]["name"]);
         $this->assertDatabaseMissing('users', [
             'email' => 'rifaldy@gmail.com',
             'username' => 'rifaldy',
@@ -70,4 +70,92 @@ class UserControllerTest extends TestCase
 
         $responseLogin->assertStatus(401);
     }
+    public function test_register_with_invalid_email_field()
+    {   
+        //without email
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The email field is required.",$content["errors"]["email"], );
+        $this->assertDatabaseMissing('users', [
+            'name' => 'Rifaldy Elninoru',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+
+        //invalid email
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The email must be a valid email address.",$content["errors"]["email"], );
+        $this->assertDatabaseMissing('users', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+        ]);
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+        ]);
+
+        $responseLogin->assertStatus(401);
+
+        //email already exist
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+
+        $response = $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi222',
+            'confirm_password' => 'rifaldi222',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(422);
+        $this->assertContains("The email has already been taken.",$content["errors"]["email"], );
+
+        $responseLogin = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi222',
+        ]);
+
+        $responseLogin->assertStatus(401);
+
+    }
+
+    
+
 }
