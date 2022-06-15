@@ -48,9 +48,9 @@ class CompanyController extends Controller
         
         $company = Company::create($validatedData);
 
-        User::find(Auth::user()->id)->update([
-            'company_id' => $company->id
-        ]);
+        $user = Auth::user();
+        $user->company_id = $company->id;
+        $user->save();
     
         return ResponseFormatter::success($validatedData, "Company has been created", 201, 'success');
     }
@@ -58,5 +58,48 @@ class CompanyController extends Controller
     public function companyDetail($company_id){
         $company = Company::getCompanyDetail($company_id);
         return ResponseFormatter::success($company, "Success Get Company Detail", 200, 'success');
+    }
+
+    public function joinCompany(Request $request){
+        $company = Company::find($request->company_id);
+        $newCompanyMember = User::find($request->user_id);
+
+        if($company == null){
+            return ResponseFormatter::success(null, "Company Not Found", 200, 'success');
+        }
+
+        if($newCompanyMember == null){
+            return ResponseFormatter::success(null, "User Not Found", 200, 'success');
+        }
+
+        if(Auth::user()->company_id != $company->id){
+            return ResponseFormatter::error(null, "Unauthorized User", 401, 'Unauthorized.');
+        }
+        $newCompanyMember->update([
+            'company_id' => $company->id
+        ]);
+        return ResponseFormatter::success(['user name' => $newCompanyMember->name, 'company name' => $company->name], "Success Getting Other People Into The Company", 200, 'success');
+    }
+
+    public function leaveCompany(){
+        $user = Auth::user();
+        $user->company_id = null;
+        $user->save();
+
+        return ResponseFormatter::success(null, "Success Leave Company", 200, 'success');
+    }
+
+    public function companyMembers($company_id){
+        $company = Company::find($company_id);
+
+        if($company == null){
+            return ResponseFormatter::success(null, "Company Not Found", 200, 'success');
+        }
+
+        if($company->id != Auth::user()->company_id){
+            return ResponseFormatter::error(null, "Unauthorized User", 401, 'Unauthorized.');
+        }
+
+        return ResponseFormatter::success($company->users, "Success Get Company Members", 200, 'success');
     }
 }
