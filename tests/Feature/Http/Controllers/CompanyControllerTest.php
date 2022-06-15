@@ -906,7 +906,7 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
-    public function test_leave_company_success(){
+    public function test_success_leave_company(){
         $company = Company::factory()->create([
             'id' => 109,
             'category' => 'Technology',
@@ -942,6 +942,137 @@ class CompanyControllerTest extends TestCase
     public function test_leave_company_with_unauthenticated_user(){
 
         $response = $this->post('/api/company/leave');
+
+        $response->assertStatus(401)->assertExactJson([
+            'meta' => [
+                'code' => 401,
+                'status' => 'error',
+                'message' => 'Unauthenticated'
+            ],
+            'data' => null,
+            'errors' => 'Unauthenticated.'
+        ]);
+    }
+
+    public function test_success_get_company_mambers(){
+        $company = Company::factory()->create([
+            'id' => 110,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $user = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        $user1 = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->get('/api/company/110/members');
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get Company Members'
+            ],
+            'data' => [
+                $user->toArray(),
+                $user1->toArray()
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_company_mambers_with_incorrect_company_id(){
+        $company = Company::factory()->create([
+            'id' => 111,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $user = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->get('/api/company/9999/members');
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Company Not Found'
+            ],
+            'data' => null,
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_company_mambers_with_unauthorized_user(){
+        $company = Company::factory()->create([
+            'id' => 112,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $company2 = Company::factory()->create([
+            'id' => 113,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        $user1 = User::factory()->create([
+            'company_id' => $company2->id
+        ]);
+
+        Sanctum::actingAs(
+            $user1
+        );
+
+        $response = $this->get('/api/company/112/members');
+
+        $response->assertStatus(401)->assertExactJson([
+            'meta' => [
+                'code' => 401,
+                'status' => 'error',
+                'message' => 'Unauthorized User'
+            ],
+            'data' => null,
+            'errors' => 'Unauthorized.'
+        ]);
+    }
+    
+    public function test_get_company_mambers_with_unauthenticated_user(){
+        $company = Company::factory()->create([
+            'id' => 112,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $company2 = Company::factory()->create([
+            'id' => 113,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        User::factory()->create([
+            'company_id' => $company2->id
+        ]);
+
+        $response = $this->get('/api/company/112/members');
 
         $response->assertStatus(401)->assertExactJson([
             'meta' => [
