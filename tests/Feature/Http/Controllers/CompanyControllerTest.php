@@ -650,6 +650,7 @@ class CompanyControllerTest extends TestCase
         ]);
     }
 
+    // Test Get Company Detail With Correct Company ID
     public function test_get_company_detail_with_correct_company_id(){
         $company = Company::factory()->create([
             'id' => 100,
@@ -902,6 +903,54 @@ class CompanyControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'id' => $newCompanyMember->id,
             'company_id' => $company->id
+        ]);
+    }
+
+    public function test_leave_company_success(){
+        $company = Company::factory()->create([
+            'id' => 109,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $user = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->post('/api/company/leave');
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Leave Company'
+            ],
+            'data' => null,
+            'errors' => null
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'company_id' => null
+        ]);
+    }
+
+    public function test_leave_company_with_unauthenticated_user(){
+
+        $response = $this->post('/api/company/leave');
+
+        $response->assertStatus(401)->assertExactJson([
+            'meta' => [
+                'code' => 401,
+                'status' => 'error',
+                'message' => 'Unauthenticated'
+            ],
+            'data' => null,
+            'errors' => 'Unauthenticated.'
         ]);
     }
 }
