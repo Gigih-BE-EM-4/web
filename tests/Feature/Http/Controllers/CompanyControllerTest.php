@@ -360,7 +360,7 @@ class CompanyControllerTest extends TestCase
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
             'email' => 'travi@gmail.com',
-            'contact' => '081287127817271'
+            'contact' => '08128712781727110'
         ]);
 
         $user1 = User::factory()->create();
@@ -374,7 +374,7 @@ class CompanyControllerTest extends TestCase
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
             'bio' => 'Perusahaan terbaik di jakarta raya',
-            'contact' => '081287127817271',
+            'contact' => '08128712781727111',
             'email' => 'travi@gmail.com',
         ]);
 
@@ -402,7 +402,7 @@ class CompanyControllerTest extends TestCase
             'category' => 'Technology',
             'email' => 'travi@gmail.com',
             'profile' => '/Company/Profile/' . $time . $fileName,
-            'contact' => '081287127817271',
+            'contact' => '08128712781727110',
             'bio' => 'Perusahaan terbaik di jakarta raya',
         ]);
 
@@ -412,7 +412,7 @@ class CompanyControllerTest extends TestCase
             'category' => 'Technology',
             'email' => 'travi@gmail.com',
             'profile' => '/Company/Profile/' . $time . $fileName,
-            'contact' => '081287127817271',
+            'contact' => '08128712781727111',
             'bio' => 'Perusahaan terbaik di jakarta raya',
         ]);
 
@@ -449,7 +449,7 @@ class CompanyControllerTest extends TestCase
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
             'email' => 'kitfood@gmail.com',
-            'contact' => '081287127817271'
+            'contact' => '08128712781727112'
         ]);
 
         $user1 = User::factory()->create();
@@ -462,7 +462,7 @@ class CompanyControllerTest extends TestCase
             'address' => 'Jakarta Selatan',
             'category' => 'Technology',
             'bio' => 'Perusahaan terbaik di jakarta raya',
-            'contact' => '081287127817271',
+            'contact' => '08128712781727113',
             'email' => 'kitfood1@gmail.com',
         ]);
 
@@ -490,7 +490,7 @@ class CompanyControllerTest extends TestCase
             'category' => 'Technology',
             'email' => 'kitfood@gmail.com',
             'profile' => '/Company/Profile/' . $time . $fileName,
-            'contact' => '081287127817271',
+            'contact' => '08128712781727112',
             'bio' => 'Perusahaan terbaik di jakarta raya',
         ]);
 
@@ -500,7 +500,7 @@ class CompanyControllerTest extends TestCase
             'category' => 'Technology',
             'email' => 'kitfood1@gmail.com',
             'profile' => '/Company/Profile/' . $time . $fileName,
-            'contact' => '081287127817271',
+            'contact' => '08128712781727113',
             'bio' => 'Perusahaan terbaik di jakarta raya',
         ]);
 
@@ -514,6 +514,93 @@ class CompanyControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'id' => $user1->id,
             'company_id' => 4
+        ]);
+
+        unlink(public_path() . '/Company/Profile/' . $time . $fileName);
+    }
+
+    public function test_create_company_with_duplicate_contact(){
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+        $profile1 = UploadedFile::fake()->image('company_profile134.jpg');
+
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->postJson('/api/company', [
+            'name' => 'Jalan Jalan Dot COm',
+            'profile' => $profile,
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'jalanjalan@gmail.com',
+            'contact' => '081287127817271'
+        ]);
+
+        $user1 = User::factory()->create();
+        Sanctum::actingAs(
+            $user1
+        );
+
+        $response1 = $this->postJson('/api/company', [
+            'name' => 'Belanja.com',
+            'profile' => $profile1,
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+            'contact' => '081287127817271',
+            'email' => 'belanja@gmail.com',
+        ]);
+
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
+        $fileName1 = $profile1->getClientOriginalName();
+
+        $response1->assertStatus(422)->assertExactJson([
+            'meta' => [
+                'code' => 422,
+                'status' => 'error',
+                'message' => 'Unprocessable Entity'
+            ],
+            'data' => null,
+            'errors' => [
+                'contact' => [
+                    'The contact has already been taken.'
+                ]
+            ]
+        ]);
+
+        $this->assertDatabaseHas('companies', [
+            'name' => 'Jalan Jalan Dot COm',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'jalanjalan@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertDatabaseMissing('companies', [
+            'name' => 'Belanja.com',
+            'address' => 'Jakarta Selatan',
+            'category' => 'Technology',
+            'email' => 'belanja@gmail.com',
+            'profile' => '/Company/Profile/' . $time . $fileName,
+            'contact' => '081287127817271',
+            'bio' => 'Perusahaan terbaik di jakarta raya',
+        ]);
+
+        $this->assertFileExists(public_path() . '/Company/Profile/' . $time . $fileName);
+        $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName1);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'company_id' => 4
+        ]);
+        $this->assertDatabaseMissing('users', [
+            'id' => $user1->id,
+            'company_id' => 5
         ]);
 
         unlink(public_path() . '/Company/Profile/' . $time . $fileName);
@@ -559,7 +646,7 @@ class CompanyControllerTest extends TestCase
 
         $this->assertFileDoesNotExist(public_path() . '/Company/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
-            'company_id' => 4
+            'company_id' => 5
         ]);
     }
 

@@ -18,7 +18,7 @@ class CompanyController extends Controller
             'address' => 'required',
             'category' => 'required',
             'email' => 'required|email:dns|unique:companies',
-            'contact' => 'required'
+            'contact' => 'required|unique:companies'
         ]);
     }
 
