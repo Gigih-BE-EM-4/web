@@ -717,4 +717,190 @@ class CompanyControllerTest extends TestCase
             'errors' => null
         ]);
     }
+
+    public function test_join_company_with_correct_company_and_user_id(){
+        $company = Company::factory()->create([
+            'id' => 104,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $newCompanyUser = User::factory()->create();
+
+        $oldCompanyUser = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+        Sanctum::actingAs(
+            $oldCompanyUser
+        );
+
+        $response = $this->get('/api/company/join', [
+            'company_id' => $company->id,
+            'user_id' => $newCompanyUser->id
+        ]);
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Getting Other People Into The Company'
+            ],
+            'data' => [
+                'user name' => $newCompanyUser->name,
+                'company name' => $company->name
+            ],
+            'errors' => null
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $newCompanyUser->id,
+            'company_id' => $company->id
+        ]);
+    }
+
+    public function test_join_company_with_incorrect_company_id_and_correct_user_id(){
+        $company = Company::factory()->create([
+            'id' => 105,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $newCompanyUser = User::factory()->create();
+
+        $oldCompanyUser = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        Sanctum::actingAs(
+            $oldCompanyUser
+        );
+
+        $response = $this->get('/api/company/join', [
+            'company_id' => 300,
+            'user_id' => $newCompanyUser->id
+        ]);
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Company Not Found'
+            ],
+            'data' => null,
+            'errors' => null
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $newCompanyUser->id,
+            'company_id' => $company->id
+        ]);
+    }
+
+    public function test_join_company_with_correct_company_id_and_incorrect_user_id(){
+        $company = Company::factory()->create([
+            'id' => 106,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $newCompanyUser = User::factory()->create();
+
+        $oldCompanyUser = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        Sanctum::actingAs(
+            $oldCompanyUser
+        );
+
+        $response = $this->get('/api/company/join', [
+            'company_id' => $company->id,
+            'user_id' => $newCompanyUser->id
+        ]);
+
+        $response->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'User Not Found'
+            ],
+            'data' => null,
+            'errors' => null
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $newCompanyUser->id,
+            'company_id' => $company->id
+        ]);
+    }
+
+    public function test_join_company_with_unauthorized_user(){
+        $company = Company::factory()->create([
+            'id' => 107,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $newCompanyUser = User::factory()->create();
+
+        $unauthorizedUser = User::factory()->create();
+
+        $oldCompanyUser = User::factory()->create([
+            'company_id' => $company->id
+        ]);
+
+        Sanctum::actingAs(
+            $unauthorizedUser
+        );
+
+        $response = $this->get('/api/company/join', [
+            'company_id' => $company->id,
+            'user_id' => $newCompanyUser->id
+        ]);
+
+        $response->assertStatus(401)->assertExactJson([
+            'meta' => [
+                'code' => 401,
+                'status' => 'error',
+                'message' => 'Unauthorized User'
+            ],
+            'data' => null,
+            'errors' => "Unauthorized."
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $newCompanyUser->id,
+            'company_id' => $company->id
+        ]);
+    }
+
+    public function test_join_company_with_unauthenticated_user(){
+        $company = Company::factory()->create([
+            'id' => 108,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $newCompanyUser = User::factory()->create();
+
+        $response = $this->get('/api/company/join', [
+            'company_id' => $company->id,
+            'user_id' => $newCompanyUser->id
+        ]);
+
+        $response->assertStatus(401)->assertExactJson([
+            'meta' => [
+                'code' => 401,
+                'status' => 'error',
+                'message' => 'Unauthenticated'
+            ],
+            'data' => null,
+            'errors' => "Unauthenticated."
+        ]);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $newCompanyUser->id,
+            'company_id' => $company->id
+        ]);
+    }
 }
