@@ -734,7 +734,7 @@ class CompanyControllerTest extends TestCase
             $oldCompanyUser
         );
 
-        $response = $this->get('/api/company/join', [
+        $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
             'user_id' => $newCompanyUser->id
         ]);
@@ -775,7 +775,7 @@ class CompanyControllerTest extends TestCase
             $oldCompanyUser
         );
 
-        $response = $this->get('/api/company/join', [
+        $response = $this->post('/api/company/join', [
             'company_id' => 300,
             'user_id' => $newCompanyUser->id
         ]);
@@ -813,9 +813,9 @@ class CompanyControllerTest extends TestCase
             $oldCompanyUser
         );
 
-        $response = $this->get('/api/company/join', [
+        $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
-            'user_id' => $newCompanyUser->id
+            'user_id' => 3002
         ]);
 
         $response->assertOk()->assertExactJson([
@@ -845,7 +845,8 @@ class CompanyControllerTest extends TestCase
 
         $unauthorizedUser = User::factory()->create();
 
-        $oldCompanyUser = User::factory()->create([
+        // old company user
+        User::factory()->create([
             'company_id' => $company->id
         ]);
 
@@ -853,7 +854,7 @@ class CompanyControllerTest extends TestCase
             $unauthorizedUser
         );
 
-        $response = $this->get('/api/company/join', [
+        $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
             'user_id' => $newCompanyUser->id
         ]);
@@ -883,7 +884,7 @@ class CompanyControllerTest extends TestCase
 
         $newCompanyUser = User::factory()->create();
 
-        $response = $this->get('/api/company/join', [
+        $response = $this->post('/api/company/join', [
             'company_id' => $company->id,
             'user_id' => $newCompanyUser->id
         ]);
