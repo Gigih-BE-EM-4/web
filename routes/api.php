@@ -21,7 +21,6 @@ Route::post('user/register', [UserController::class, 'register']);
 Route::post('user/login', [UserController::class, 'login'])->name("user");
 Route::get('notAuthenticated', [App\Http\Controllers\ErrorController::class, 'notAuthenticated'])->name("notAuthenticated");
 Route::get('user/verify/{verify}', [UserController::class, 'verify'])->name("user.verify");
-Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
   return $request->user();
@@ -41,7 +40,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('user', [UserController::class, 'update'])->name("user.update");
   Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
   Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
+  Route::get('user/ping', [UserController::class, 'ping'])->name("user.ping");
 });
+
+Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");
+
 
 Route::group(['middleware' => ['auth:sanctum', 'hasCompany']], function () {
   Route::get('user/company/projects', [CompanyProjectController::class, 'getAllProjects'])->name("user.company.projects");
