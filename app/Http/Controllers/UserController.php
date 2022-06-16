@@ -162,4 +162,8 @@ class UserController extends Controller
       return ResponseFormatter::error(null, "User not logged out", 400, "internal error");
     }
   }
+
+  public function ping(){
+      return ResponseFormatter::success(null, "user is logged in", 200, 'success');
+  }
 }

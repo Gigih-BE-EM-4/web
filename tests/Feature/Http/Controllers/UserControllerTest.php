@@ -35,13 +35,6 @@ class UserControllerTest extends TestCase
             'username' => 'rifaldy',
             'address' => 'Jakarta Selatan',
         ]);
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(201);
     }
 
     public function test_register_without_name_field()
@@ -129,7 +122,7 @@ class UserControllerTest extends TestCase
         $response->assertStatus(422);
         $this->assertContains("The email has already been taken.",$content["errors"]["email"], );
     }
-    
+
     public function test_register_without_username_field(){
         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
@@ -260,6 +253,29 @@ class UserControllerTest extends TestCase
     }
 
 
-    
+    // ===========================================================================================================
+    // ================================ TEST LOGIN ============================================================
+    // ===========================================================================================================
 
-}
+    public function test_login_with_valid_data()
+    {
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+    }
+}   
