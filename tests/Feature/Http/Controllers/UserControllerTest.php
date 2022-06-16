@@ -257,7 +257,7 @@ class UserControllerTest extends TestCase
     // ================================ TEST LOGIN ============================================================
     // ===========================================================================================================
 
-    public function test_login_with_valid_data()
+    public function test_login_with_valid_username_and_password()
     {
         $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
@@ -277,5 +277,93 @@ class UserControllerTest extends TestCase
         $response->assertStatus(201);
         $this->assertNotNull($content["data"]["token"]);
         $this->assertNull($content["errors"]);
+        
+        
+
+        // $response = $this->get('/api/user/ping', [
+        //     'Authorization' => '',
+        // ]);
+        // $response->assertStatus(200);
     }
+    public function test_login_with_valid_email_and_password(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.com',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+    }
+
+    public function test_login_with_invalid_username(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifalds',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertEquals("user/password not match",$content["errors"] );
+        $this->assertNotNull($content["errors"]);
+    }
+
+    public function test_login_with_invalid_email(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.coms',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertEquals("user/password not match",$content["errors"] );
+        $this->assertNotNull($content["errors"]);
+    }
+
+    public function test_login_with_invalid_password(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi1112',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertEquals("user/password not match",$content["errors"] );
+        $this->assertNotNull($content["errors"]);
+    }
+
+    
 }   
