@@ -21,6 +21,7 @@ Route::post('user/register', [UserController::class, 'register']);
 Route::post('user/login', [UserController::class, 'login'])->name("user");
 Route::get('notAuthenticated', [App\Http\Controllers\ErrorController::class, 'notAuthenticated'])->name("notAuthenticated");
 Route::get('user/verify/{verify}', [UserController::class, 'verify'])->name("user.verify");
+Route::get('/user/forgot-password/{email}', [UserController::class, 'forgot'])->name("user.forgot");
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
   return $request->user();
