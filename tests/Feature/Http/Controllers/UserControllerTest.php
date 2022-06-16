@@ -411,6 +411,37 @@ class UserControllerTest extends TestCase
         ]);
     }
 
+    public function test_forgot_password_with_true_email(){
+        $user = User::factory()->create();
+        $response = $this->get('/api/user/forgot-password/'.$user->email);
+
+        $response->assertStatus(200);
+
+        $content = $response->decodeResponseJson();
+        $this->assertNull($content["errors"]);
+
+
+        $pass = '12345678';
+        $response = $this->postJson('/api/user/login', [
+            'username' => $user->username,
+            'password' => $pass,
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+
+    }
+
+    public function test_forgot_password_with_false_email(){
+        $response = $this->get('/api/user/forgot-password/test@gmail.com');
+        $content = $response->decodeResponseJson();
+        $response->assertStatus(404);
+        $this->assertEquals($content["errors"],"user not found");
+
+    }
+
     
 
     
