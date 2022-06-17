@@ -441,6 +441,15 @@ class UserControllerTest extends TestCase
         $this->assertEquals($content["errors"],"user not found");
 
     }
+    //if email isnt email
+    public function test_forgot_password_with_invalid_email(){
+        $response = $this->get('/api/user/forgot-password/test');
+        $content = $response->decodeResponseJson();
+        $response->assertStatus(422);
+        $this->assertContains("Email not valid",$content["errors"]["email"], );
+
+
+    }
 
     
 
