@@ -28,14 +28,4 @@ class Company extends Model
   {
     return $this->hasMany(Project::class, 'company_id', 'id');
   }
-
-  public static function getCompanyDetail($company_id)
-  {
-
-    if (User::where([['id', '=', Auth::user()->id], ['company_id', '=', $company_id]])->first() == null) {
-      return null;
-    } else {
-      return User::where([['id', '=', Auth::user()->id], ['company_id', '=', $company_id]])->first()->company;
-    }
-  }
 }

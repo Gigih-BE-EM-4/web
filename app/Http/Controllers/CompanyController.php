@@ -56,7 +56,7 @@ class CompanyController extends Controller
     }
 
     public function companyDetail($company_id){
-        $company = Company::getCompanyDetail($company_id);
+        $company = Company::find($company_id);
         return ResponseFormatter::success($company, "Success Get Company Detail", 200, 'success');
     }
 
