@@ -102,4 +102,10 @@ class CompanyController extends Controller
 
         return ResponseFormatter::success($company->users, "Success Get Company Members", 200, 'success');
     }
+
+    public function index(Request $request){
+        return response()->json([
+            'data' => Company::paginate(1)
+        ]);
+    }
 }

@@ -1090,4 +1090,28 @@ class CompanyControllerTest extends TestCase
             'errors' => 'Unauthenticated.'
         ]);
     }
+    
+    public function test_aja(){
+
+        Company::factory()->create([
+            'id' => 1000,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        Company::factory()->create([
+            'id' => 1001,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        Company::factory()->create([
+            'id' => 1002,
+            'category' => 'Technology',
+            'profile' => '/Company/Profile/company1.jpg'
+        ]);
+
+        $response = $this->get('/api/companies');
+        $response->dd();
+    }
 }
