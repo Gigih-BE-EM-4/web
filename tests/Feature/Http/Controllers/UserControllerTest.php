@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -35,16 +37,9 @@ class UserControllerTest extends TestCase
             'username' => 'rifaldy',
             'address' => 'Jakarta Selatan',
         ]);
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(201);
     }
 
-    public function test_register_with_invalid_name_field()
+    public function test_register_without_name_field()
     {
         //without name
         $response = $this->postJson('/api/user/register', [
@@ -62,15 +57,8 @@ class UserControllerTest extends TestCase
             'username' => 'rifaldy',
             'address' => 'Jakarta Selatan',
         ]);
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(401);
     }
-    public function test_register_with_invalid_email_field()
+    public function test_register_without_email_field()
     {   
         //without email
         $response = $this->postJson('/api/user/register', [
@@ -89,14 +77,8 @@ class UserControllerTest extends TestCase
             'username' => 'rifaldy',
             'address' => 'Jakarta Selatan',
         ]);
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(401);
-
+    }
+    public function test_register_with_invalid_email_field(){
         //invalid email
         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
@@ -116,14 +98,9 @@ class UserControllerTest extends TestCase
             'username' => 'rifaldy',
             'address' => 'Jakarta Selatan',
         ]);
+    }
 
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(401);
-
+    public function test_register_with_duplicate_email_field(){
         //email already exist
         $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
@@ -146,16 +123,9 @@ class UserControllerTest extends TestCase
 
         $response->assertStatus(422);
         $this->assertContains("The email has already been taken.",$content["errors"]["email"], );
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi222',
-        ]);
-
-        $responseLogin->assertStatus(401);
-
     }
-    public function test_register_with_invalid_username_field(){
+
+    public function test_register_without_username_field(){
         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
             'email' => 'rifaldy@gmail.com',
@@ -171,15 +141,11 @@ class UserControllerTest extends TestCase
             'email' => 'rifaldy@gmail.com',
         ]);
 
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy@gmail.com',
-            'password' => 'rifaldi111',
-        ]);
+    }
 
-        $responseLogin->assertStatus(401);
-
-        //username under 5 character
-        $response = $this->postJson('/api/user/register', [
+    public function test_register_with_invalid_username_length_field(){
+          //username under 5 character
+          $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
             'email' => 'rifaldy@gmail.com',
             'username' => 'rifa',
@@ -194,16 +160,9 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'email' => 'rifaldy@gmail.com',
         ]);
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy@gmail.com',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(401);
     }
 
-    public function test_register_with_invalid_address_field(){
+    public function test_register_without_address_field(){
         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
             'email' => 'rifaldy@gmail.com',
@@ -218,13 +177,6 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'email' => 'rifaldy@gmail.com',
         ]);
-
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy@gmail.com',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(401);
     }
 
     public function test_register_with_invalid_password(){
@@ -244,12 +196,10 @@ class UserControllerTest extends TestCase
             'email' => 'rifaldy@gmail.com',
         ]);
 
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
+        
+    }
 
-        $responseLogin->assertStatus(401);
+    public function test_register_with_invalid_password_field_length(){
         //password field under 8 character
         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
@@ -266,9 +216,11 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'email' => 'rifaldy@gmail.com',
         ]);
+    }
 
-        //without confirm password field
-        $response = $this->postJson('/api/user/register', [
+    public function test_register_without_confirm_password_field(){
+         //without confirm password field
+         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
             'email' => 'rifaldy@gmail.com',
             'address' => 'Jakarta',
@@ -282,22 +234,16 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseMissing('users', [
             'email' => 'rifaldy@gmail.com',
         ]);
+    }
 
-        $responseLogin = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
-        ]);
-
-        $responseLogin->assertStatus(401);
-
-        //without confirm password field
+    public function test_register_with_password_and_cofirm_password_missmatch(){
         $response = $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
             'email' => 'rifaldy@gmail.com',
             'address' => 'Jakarta',
             'username' => 'rifaldy',
             'confirm' => 'rifaldi111',
-            'confirm_password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi1113',
         ]);
         $content = $response->decodeResponseJson();
 
@@ -309,6 +255,203 @@ class UserControllerTest extends TestCase
     }
 
 
+    // ===========================================================================================================
+    // ================================ TEST LOGIN ============================================================
+    // ===========================================================================================================
+
+    public function test_login_with_valid_username_and_password()
+    {
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+        
+        
+
+        // $response = $this->get('/api/user/ping', [
+        //     'Authorization' => '',
+        // ]);
+        // $response->assertStatus(200);
+    }
+    public function test_login_with_valid_email_and_password(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.com',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+    }
+
+    public function test_login_with_invalid_username(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifalds',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertEquals("user/password not match",$content["errors"] );
+        $this->assertNotNull($content["errors"]);
+    }
+
+    public function test_login_with_invalid_email(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy@gmail.coms',
+            'password' => 'rifaldi111',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertEquals("user/password not match",$content["errors"] );
+        $this->assertNotNull($content["errors"]);
+    }
+
+    public function test_login_with_invalid_password(){
+        $this->postJson('/api/user/register', [
+            'name' => 'Rifaldy Elninoru',
+            'email' => 'rifaldy@gmail.com',
+            'username' => 'rifaldy',
+            'address' => 'Jakarta Selatan',
+            'password' => 'rifaldi111',
+            'confirm_password' => 'rifaldi111',
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => 'rifaldy',
+            'password' => 'rifaldi1112',
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertEquals("user/password not match",$content["errors"] );
+        $this->assertNotNull($content["errors"]);
+    }
+
+    // public function test_logout_with_valid_data() {
+    //     $user = User::factory()->create();
+
+    //     Sanctum::actingAs(
+    //         $user
+    //     );
+
+    //     $response = $this->postJson('/api/user/logout');
+
+    //     $response->assertStatus(200);
+    // }
+
+    public function test_verify_with_valid_token() {
+        $token = "test333";
+        $user = User::factory()->create([
+            "verify"=>$token,
+        ]);
+        $response = $this->get('/api/user/verify/'.$token);
+    
+        $response->assertStatus(201);
+        
+        $response = $this->get('/api/user/verify/');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'verify' => null,
+        ]);
+    }
+
+    public function test_verify_with_invalid_token() {
+        $token = "test333";
+        $user = User::factory()->create([
+            "verify"=>$token,
+        ]);
+        $response = $this->get('/api/user/verify/'.$token."1");
+    
+        $response->assertStatus(404);
+        
+        $response = $this->get('/api/user/verify/');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'verify' => $token,
+        ]);
+    }
+
+    public function test_forgot_password_with_true_email(){
+        $user = User::factory()->create();
+        $response = $this->get('/api/user/forgot-password/'.$user->email);
+
+        $response->assertStatus(200);
+
+        $content = $response->decodeResponseJson();
+        $this->assertNull($content["errors"]);
+
+
+        $pass = '12345678';
+        $response = $this->postJson('/api/user/login', [
+            'username' => $user->username,
+            'password' => $pass,
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+
+    }
+
+    public function test_forgot_password_with_false_email(){
+        $response = $this->get('/api/user/forgot-password/test@gmail.com');
+        $content = $response->decodeResponseJson();
+        $response->assertStatus(404);
+        $this->assertEquals($content["errors"],"user not found");
+
+    }
+    //if email isnt email
+    public function test_forgot_password_with_invalid_email(){
+        $response = $this->get('/api/user/forgot-password/test');
+        $content = $response->decodeResponseJson();
+        $response->assertStatus(422);
+        $this->assertContains("Email not valid",$content["errors"]["email"], );
+
+
+    }
+
     
 
-}
+    
+}   

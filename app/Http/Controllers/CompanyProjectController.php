@@ -131,6 +131,38 @@ class CompanyProjectController extends Controller
     return ResponseFormatter::success(ProjectRole::find($projectRole->id), "Project Role has been created");
   }
 
+  public function updateProjectRole(Request $request, $project_id, $role_id)
+  {
+
+    $validator = Validator::make($request->all(), [
+      'name' => 'required|string|max:255',
+      'quota' => 'required|integer',
+      'description' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+      return ResponseFormatter::error(null, 'Validation Error', 400, $validator->errors());
+    }
+
+    $data = $request->all();
+
+    // return $data;
+
+    $projectRole = ProjectRole::where('id', $role_id)->where('project_id', $project_id)->first();
+
+    // return $projectRole;
+
+    if ($projectRole) {
+      if (Auth::user()->company_id != Project::find($project_id)->company_id) {
+        return ResponseFormatter::error(null, 'You are not in this company', 401, "You are not in this company");
+      }
+      $projectRole->update($data);
+      return ResponseFormatter::success(ProjectRole::find($projectRole->id), "Project Role has been updated");
+    } else {
+      return ResponseFormatter::error(null, "Project Role not found", 404, "Project Role {$data['id']} not found");
+    }
+  }
+
   public function getAllApplicants(Request $request)
   {
   }
