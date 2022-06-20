@@ -56,7 +56,7 @@ class CompanyController extends Controller
     }
 
     public function companyDetail($company_id){
-        $company = Company::getCompanyDetail($company_id);
+        $company = Company::find($company_id);
         return ResponseFormatter::success($company, "Success Get Company Detail", 200, 'success');
     }
 
@@ -101,5 +101,11 @@ class CompanyController extends Controller
         }
 
         return ResponseFormatter::success($company->users, "Success Get Company Members", 200, 'success');
+    }
+
+    public function index(Request $request){
+        return response()->json([
+            'data' => Company::paginate(1)
+        ]);
     }
 }

@@ -664,13 +664,6 @@ class CompanyControllerTest extends TestCase
             'profile' => '/Company/Profile/company2.jpg'
         ]);
 
-        $user1 = User::factory()->create([
-            'company_id' => $company->id
-        ]);
-        
-        Sanctum::actingAs(
-            $user1
-        );
 
         $response = $this->get('/api/company/100');
 
@@ -697,14 +690,6 @@ class CompanyControllerTest extends TestCase
             'category' => 'Technology',
             'profile' => '/Company/Profile/company2.jpg'
         ]);
-
-        $user = User::factory()->create([
-            'company_id' => $company->id
-        ]);
-        
-        Sanctum::actingAs(
-            $user
-        );
 
         $response = $this->get('/api/company/500');
 
@@ -965,14 +950,16 @@ class CompanyControllerTest extends TestCase
             'company_id' => (string)$company->id,
             'bio' => 'Seorang pelajar yang tangguh',
             'last_education' => 'Sekolah Menangah Atas',
-            'profile' => 'gambar.jpg'
+            'profile' => 'gambar.jpg',
+            'verify' => null
         ]);
 
         $user1 = User::factory()->create([
             'company_id' =>(string)$company->id,
             'bio' => 'Seorang pelajar yang tangguh',
             'last_education' => 'Sekolah Menangah Pertama',
-            'profile' => 'gambar.jpg'
+            'profile' => 'gambar.jpg',
+            'verify' => null
         ]);
 
         Sanctum::actingAs(
@@ -1090,4 +1077,28 @@ class CompanyControllerTest extends TestCase
             'errors' => 'Unauthenticated.'
         ]);
     }
+    
+    // public function test_aja(){
+
+    //     Company::factory()->create([
+    //         'id' => 1000,
+    //         'category' => 'Technology',
+    //         'profile' => '/Company/Profile/company1.jpg'
+    //     ]);
+
+    //     Company::factory()->create([
+    //         'id' => 1001,
+    //         'category' => 'Technology',
+    //         'profile' => '/Company/Profile/company1.jpg'
+    //     ]);
+
+    //     Company::factory()->create([
+    //         'id' => 1002,
+    //         'category' => 'Technology',
+    //         'profile' => '/Company/Profile/company1.jpg'
+    //     ]);
+
+    //     $response = $this->get('/api/companies');
+    //     $response->dd();
+    // }
 }

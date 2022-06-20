@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -364,6 +366,92 @@ class UserControllerTest extends TestCase
         $this->assertEquals("user/password not match",$content["errors"] );
         $this->assertNotNull($content["errors"]);
     }
+
+    // public function test_logout_with_valid_data() {
+    //     $user = User::factory()->create();
+
+    //     Sanctum::actingAs(
+    //         $user
+    //     );
+
+    //     $response = $this->postJson('/api/user/logout');
+
+    //     $response->assertStatus(200);
+    // }
+
+    public function test_verify_with_valid_token() {
+        $token = "test333";
+        $user = User::factory()->create([
+            "verify"=>$token,
+        ]);
+        $response = $this->get('/api/user/verify/'.$token);
+    
+        $response->assertStatus(201);
+        
+        $response = $this->get('/api/user/verify/');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'verify' => null,
+        ]);
+    }
+
+    public function test_verify_with_invalid_token() {
+        $token = "test333";
+        $user = User::factory()->create([
+            "verify"=>$token,
+        ]);
+        $response = $this->get('/api/user/verify/'.$token."1");
+    
+        $response->assertStatus(404);
+        
+        $response = $this->get('/api/user/verify/');
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'verify' => $token,
+        ]);
+    }
+
+    public function test_forgot_password_with_true_email(){
+        $user = User::factory()->create();
+        $response = $this->get('/api/user/forgot-password/'.$user->email);
+
+        $response->assertStatus(200);
+
+        $content = $response->decodeResponseJson();
+        $this->assertNull($content["errors"]);
+
+
+        $pass = '12345678';
+        $response = $this->postJson('/api/user/login', [
+            'username' => $user->username,
+            'password' => $pass,
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(201);
+        $this->assertNotNull($content["data"]["token"]);
+        $this->assertNull($content["errors"]);
+
+    }
+
+    public function test_forgot_password_with_false_email(){
+        $response = $this->get('/api/user/forgot-password/test@gmail.com');
+        $content = $response->decodeResponseJson();
+        $response->assertStatus(404);
+        $this->assertEquals($content["errors"],"user not found");
+
+    }
+    //if email isnt email
+    public function test_forgot_password_with_invalid_email(){
+        $response = $this->get('/api/user/forgot-password/test');
+        $content = $response->decodeResponseJson();
+        $response->assertStatus(422);
+        $this->assertContains("Email not valid",$content["errors"]["email"], );
+
+
+    }
+
+    
 
     
 }   

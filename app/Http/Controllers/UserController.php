@@ -154,6 +154,33 @@ class UserController extends Controller
     }
   }
 
+  public function forgot($email)
+  {
+    if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+      $user = User::where('email', $email)->first();
+      if ($user) {
+        // $password = Str::random(10);
+        $password = "12345678";
+        $hash = bcrypt($password);
+        //ceritanya ngirim email
+        $sendEmail = true;
+        if($sendEmail){
+          $user->password = $hash;
+          $user->save();
+          return ResponseFormatter::success($user, "user has been reset", 200, 'success');
+        }else{
+          return ResponseFormatter::error(null, "Gagal mengirim email, silahkan coba beberapa saat lagi", 404, "fail to send email");
+        }
+      } else {
+        return ResponseFormatter::error(null, "User Not Found", 404, "user not found");
+      }
+    }else{
+      return ResponseFormatter::error(null, "Unprocessable Entity", 422, ["email" => ["Email not valid"]]);
+    }
+    
+  }
+
+
   public function logOut()
   {
     if (Auth::User()->currentAccessToken()->delete()) {
