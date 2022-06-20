@@ -6,30 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateAppliesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('applies', function (Blueprint $table) {
-            $table->id();
-            $table->integer('user_id');
-            $table->integer('project_role_id');
-            $table->string('cv');
-            $table->string('extra_answer')->nullable();
-            $table->timestamps();
-        });
-    }
+  /**
+   * Run the migrations.
+   *
+   * @return void
+   */
+  public function up()
+  {
+    Schema::create('applies', function (Blueprint $table) {
+      $table->id();
+      $table->integer('user_id');
+      $table->integer('project_id');
+      $table->integer('project_role_id');
+      $table->string('cv');
+      $table->string('extra_answer')->nullable();
+      $table->timestamps();
+    });
+  }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('applies');
-    }
+  /**
+   * Reverse the migrations.
+   *
+   * @return void
+   */
+  public function down()
+  {
+    Schema::dropIfExists('applies');
+  }
 }

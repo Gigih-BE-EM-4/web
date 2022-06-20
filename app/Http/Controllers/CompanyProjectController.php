@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Apply;
 use App\Models\Company;
 use App\Models\Project;
 use App\Models\ProjectRole;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ProjectMember;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
@@ -185,7 +187,24 @@ class CompanyProjectController extends Controller
     return ResponseFormatter::success(ProjectMember::find($projectMember), "Project Member has been created");
   }
 
-  public function getAllApplicants(Request $request)
+  public function getAllApplicants(Request $request, $project_id, $role_id)
   {
+    try {
+      $project = Project::find($project_id);
+
+      if (Auth::user()->company_id != $project->company_id) {
+        return ResponseFormatter::error(null, 'You are not in this company', 401, "You are not in this company");
+      }
+
+      $applicants = Apply::with(['user', 'projectRole'])->where('project_id', $project_id)->where('project_role_id', $role_id)->get(['user_id', 'project_role_id']);
+
+      if (count($applicants) > 0) {
+        return ResponseFormatter::success($applicants, "Applicants has been retrieved");
+      } else {
+        return ResponseFormatter::error(null, "Applicants not found", 404, "Applicants not found");
+      }
+    } catch (Exception $err) {
+      return ResponseFormatter::error(null, "Something went wrong", 500, $err->getMessage());
+    }
   }
 }

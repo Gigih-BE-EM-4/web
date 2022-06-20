@@ -83,9 +83,8 @@ class DatabaseSeeder extends Seeder
     // ]);
 
     Company::factory()->count(3)->create();
-    Project::factory()->count(20)->create();
     $this->call([
-
+      ProjectSeeder::class,
       UserSeeder::class,
     ]);
   }
