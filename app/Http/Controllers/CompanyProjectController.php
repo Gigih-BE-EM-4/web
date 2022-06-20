@@ -187,6 +187,21 @@ class CompanyProjectController extends Controller
     return ResponseFormatter::success(ProjectMember::find($projectMember), "Project Member has been created");
   }
 
+  public function removeProjectMember($project_id, $role_id, $id)
+  {
+
+
+    if (Auth::user()->company_id == Project::find($project_id)->company_id) {
+      if (ProjectMember::destroy($id)) {
+        return ResponseFormatter::success(null, "Project Member has been removed");
+      } else {
+        return ResponseFormatter::error(null, "Project Member not found", 404, "Project Member {$id} not found");
+      }
+    } else {
+      return ResponseFormatter::error(null, 'You are not in this company', 401, "You are not in this company");
+    }
+  }
+
   public function getAllApplicants(Request $request, $project_id, $role_id)
   {
     try {
