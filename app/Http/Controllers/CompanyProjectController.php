@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Project;
 use App\Models\ProjectRole;
-use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\ProjectMember;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Support\ValidatedData;
 
 class CompanyProjectController extends Controller
 {
@@ -161,6 +162,27 @@ class CompanyProjectController extends Controller
     } else {
       return ResponseFormatter::error(null, "Project Role not found", 404, "Project Role {$data['id']} not found");
     }
+  }
+
+  public function addProjectMember(Request $request, $project_id, $project_role_id)
+  {
+    $validator = Validator::make($request->all(), [
+      'user_id' => 'required|integer',
+    ]);
+
+    if ($validator->fails()) {
+      return ResponseFormatter::error(null, 'Validation Error', 400, $validator->errors());
+    }
+
+    $data = [
+      'project_id' => $project_id,
+      'user_id' => $request->input('user_id'),
+      'project_role_id' => $project_role_id,
+    ];
+
+    $projectMember = ProjectMember::create($data)->id;
+
+    return ResponseFormatter::success(ProjectMember::find($projectMember), "Project Member has been created");
   }
 
   public function getAllApplicants(Request $request)
