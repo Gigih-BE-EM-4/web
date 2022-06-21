@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
   Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
   Route::post('user/changepassword', [UserController::class, 'changepassword'])->name("user.change.password");
+  Route::post('user/changeprofile', [UserController::class, 'changeProfile'])->name("user.change.profile");
   Route::get('user/ping', [UserController::class, 'ping'])->name("user.ping");
 });
 

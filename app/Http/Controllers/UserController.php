@@ -77,17 +77,22 @@ class UserController extends Controller
       'confirm_password' => 'required|same:password',
     ]);
   }
+  private function changeProfileValidator(Request $request)
+  {
+    return Validator::make($request->all(), [
+      'profile' => 'image|mimes:png,jpg,gif|max:2048',
+    ]);
+  }
 
 
   private function uploadImage($request)
   {
     if ($file = $request->hasFile('profile')) {
       $file = $request->file('profile');
-      $fileName = $file->getClientOriginalName();
-      $destinationPath = public_path() . '/User/Profile';
-      $now = Carbon::now();
-      $file->move($destinationPath, $now . $fileName);
-      return "/User/Profile/" . $now . $fileName;
+      $fileName = Str::random(10).$file->getClientOriginalName();
+      $destinationPath = public_path().'/user/Profile';
+      $file->move($destinationPath,$fileName);
+      return "/User/Profile/" .$fileName;
     } else {
       return "";
     }
@@ -113,8 +118,8 @@ class UserController extends Controller
   {
     $validate = $this->updateValidator($request);
     if (!$validate->fails()) {
-      $request->merge(['profile' => $this->uploadImage($request)]);
-      $user = Auth::User()->update($request->all());
+      $data = $validate->validated();
+      $user = Auth::User()->update($data);
       if ($user) {
         return ResponseFormatter::success($user, "user has been updated", 201, 'success');
       } else {
@@ -123,6 +128,26 @@ class UserController extends Controller
     } else {
       return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
     }
+  }
+  public function changeProfile(Request $request){
+    $validate = $this->changeProfileValidator($request);
+    if(!$validate->fails()){
+      $x = $this->uploadImage($request);
+      if($x != ""){
+        $user = Auth::User()->update(['profile' => $x]);
+        if($user){
+          return ResponseFormatter::success($user, "user has been updated", 201, 'success');
+        }else{
+          return ResponseFormatter::error(null, "User not updated", 400, "internal error");
+        }
+      }else{
+        return ResponseFormatter::error(null, "Unprocessable Entity", 422, "image not uploaded");
+      }
+    }else{
+      return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
+    }
+   
+    
   }
   public function changePassword(Request $request)
   {
