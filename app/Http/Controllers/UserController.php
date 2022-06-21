@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -44,7 +45,12 @@ class UserController extends Controller
         "verify" => Str::random(40),
       ]);
       if ($user) {
-        return ResponseFormatter::success($user, "user has been created", 201, 'success');
+        \Mail::to($request->email)->send(new \App\Mail\RegisterMail($user->name,$user->verify));
+        if (\Mail::failures()) {
+          return ResponseFormater::error(null, "Email Not Sended", 400, Mail::failures());
+        }else{
+          return ResponseFormatter::success($user, "user has been created", 201, 'success');
+        }
       } else {
         return ResponseFormater::error(null, "User not created", 400, "internal error");
       }
