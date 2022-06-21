@@ -114,15 +114,23 @@ class UserController extends Controller
     $validate = $this->updateValidator($request);
     if (!$validate->fails()) {
       $request->merge(['profile' => $this->uploadImage($request)]);
-      if (isset($request->password)) {
-        $pwValidate = $this->confirmPasswordValidator($request);
-        if (!$pwValidate->fails()) {
-          $request->merge(['password' => bcrypt($request->password)]);
-        } else {
-          return ResponseFormatter::error(null, "Unprocessable Entity", 422, $pwValidate->errors());
-        }
-      }
       $user = Auth::User()->update($request->all());
+      if ($user) {
+        return ResponseFormatter::success($user, "user has been updated", 201, 'success');
+      } else {
+        return ResponseFormatter::error(null, "User not updated", 400, "internal error");
+      }
+    } else {
+      return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
+    }
+  }
+  public function changePassword(Request $request)
+  {
+    $validate = $this->confirmPasswordValidator($request);
+    if (!$validate->fails()) {
+      $user = Auth::User()->update([
+        "password" => bcrypt($request->password),
+      ]);
       if ($user) {
         return ResponseFormatter::success($user, "user has been updated", 201, 'success');
       } else {
