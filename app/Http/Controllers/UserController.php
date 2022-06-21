@@ -45,9 +45,13 @@ class UserController extends Controller
         "verify" => Str::random(40),
       ]);
       if ($user) {
-        \Mail::to($request->email)->send(new \App\Mail\RegisterMail($user->name,$user->verify));
-        if (\Mail::failures()) {
-          return ResponseFormater::error(null, "Email Not Sended", 400, Mail::failures());
+        if(env("SEND_EMAIL")){
+          \Mail::to($request->email)->send(new \App\Mail\RegisterMail($user->name,$user->verify));
+          if (\Mail::failures()) {
+            return ResponseFormater::error(null, "Email Not Sended", 400, Mail::failures());
+          }else{
+            return ResponseFormatter::success($user, "user has been created", 201, 'success');
+          }
         }else{
           return ResponseFormatter::success($user, "user has been created", 201, 'success');
         }
