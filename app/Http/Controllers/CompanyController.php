@@ -104,8 +104,8 @@ class CompanyController extends Controller
     }
 
     public function index(Request $request){
-        return response()->json([
-            'data' => Company::paginate(1)
-        ]);
+        $search = $request->query('search');
+        $companies = Company::where('name', 'LIKE', '%'.$search.'%')->orWhere('address', 'LIKE', '%'.$search.'%')->orWhere('category', 'LIKE', '%'.$search.'%')->simplePaginate(20);
+        return ResponseFormatter::success($companies, "Success Get All Companies", 200, 'success');
     }
 }
