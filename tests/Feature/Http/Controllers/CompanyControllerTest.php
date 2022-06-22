@@ -10,6 +10,8 @@ use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
+use function PHPSTORM_META\type;
+
 class CompanyControllerTest extends TestCase
 {
     use RefreshDatabase;
@@ -1077,6 +1079,1005 @@ class CompanyControllerTest extends TestCase
             'errors' => 'Unauthenticated.'
         ]);
     }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_and_without_page_parameter(){
+        $companyMatch1 = Company::factory()->create([
+            'name' => 'z123lo'
+        ]);
+        $companyMatch2 = Company::factory()->create([
+            'name' => 'z123li'
+        ]);
+        Company::factory()->create([
+            'name' => 'Barudak Bandung'
+        ]);
+
+        $response1 = $this->get('/api/companies?search=z123');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),
+                    $companyMatch2->toArray(),
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=z123li');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch2->toArray(),
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 1
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_address_and_without_page_parameter(){
+        $companyMatch1 = Company::factory()->create([
+            'address' => 'z123loa'
+        ]);
+        $companyMatch2 = Company::factory()->create([
+            'address' => 'z123lia'
+        ]);
+        Company::factory()->create([
+            'address' => 'Penarungan'
+        ]);
+
+        $response1 = $this->get('/api/companies?search=z123l');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),
+                    $companyMatch2->toArray(),
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=z123loa');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 1
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_category_and_without_page_parameter(){
+        $companyMatch1 = Company::factory()->create([
+            'category' => 'z0999'
+        ]);
+        $companyMatch2 = Company::factory()->create([
+            'category' => 'z0999'
+        ]);
+
+        $companyMatch3 = Company::factory()->create([
+            'category' => 'z0888'
+        ]);
+
+        Company::factory()->create([
+            'category' => 'Tech'
+        ]);
+
+        $response1 = $this->get('/api/companies?search=z0');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),
+                    $companyMatch2->toArray(),
+                    $companyMatch3->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 3
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=z0999');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),
+                    $companyMatch2->toArray(),
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_and_address_and_without_page_parameter(){
+        $companies = Company::factory()->count(3)->create();
+        $companies[0]['address'] = 'Penarungan';
+        $companies[1]['address'] = 'Penarukan';
+        $companies[2]['address'] = 'Subang';
+
+        $companies[0]['name'] = 'Penarukan';
+        $companies[1]['name'] = 'Sobangan';
+        $companies[2]['name'] = 'SubangKerta';
+
+        $companies[0]['category'] = 'Technology';
+        $companies[1]['category'] = 'Technology';
+        $companies[2]['category'] = 'Technology';
+
+        $companies[0]->save();
+        $companies[1]->save();
+        $companies[2]->save();
+
+        $companyMatch1 = $companies[0];
+        $companyMatch2 = $companies[1];
+
+        $response1 = $this->get('/api/companies?search=ngan');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),$companyMatch2->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+        $response1 = $this->get('/api/companies?search=Penarukan');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companyMatch1->toArray(),$companyMatch2->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_and_category_and_without_page_parameter(){
+        $companies = Company::factory()->count(3)->create();
+        $companies[0]['address'] = 'Penarungan';
+        $companies[1]['address'] = 'Penarukan';
+        $companies[2]['address'] = 'Subang';
+
+        $companies[0]['name'] = 'Technology';
+        $companies[1]['name'] = 'TechPark';
+        $companies[2]['name'] = 'SubangDumayu';
+
+        $companies[0]['category'] = 'Retail';
+        $companies[1]['category'] = 'Retail';
+        $companies[2]['category'] = 'Technology';
+
+        $companies[0]->save();
+        $companies[1]->save();
+        $companies[2]->save();
+
+        $response1 = $this->get('/api/companies?search=Tech');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companies[0]->toArray(), $companies[1]->toArray(), $companies[2]->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 3
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=Technology');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companies[0]->toArray(), $companies[2]->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_category_address_and_without_page_parameter(){
+        $companies = Company::factory()->count(3)->create();
+        $companies[0]['address'] = 'TechBandung';
+        $companies[1]['address'] = 'TechPark';
+        $companies[2]['address'] = 'Technology';
+
+        $companies[0]['name'] = 'Technology';
+        $companies[1]['name'] = 'TechPark';
+        $companies[2]['name'] = 'Alibis';
+
+        $companies[0]['category'] = 'Retail';
+        $companies[1]['category'] = 'Tech';
+        $companies[2]['category'] = 'Technology';
+
+        $companies[0]->save();
+        $companies[1]->save();
+        $companies[2]->save();
+
+        $response1 = $this->get('/api/companies?search=Tech');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companies[0]->toArray(), $companies[1]->toArray(), $companies[2]->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 3
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=Technology');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => [
+                    $companies[0]->toArray(), $companies[2]->toArray()
+                ],
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 2
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_and_with_page_parameter(){
+        $companiesMatch1 = Company::factory()->count(20)->make();
+        $companiesNotMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch2 = Company::factory()->count(20)->make();
+        $companiesNotMatch2 = Company::factory()->count(20)->make();
+
+        $namePostFix = 0;
+        for ($i=0; $i < count($companiesMatch1); $i++) { 
+            $companiesMatch1[$i]['name'] = 'AdiRasa'.$namePostFix;
+            $companiesMatch1[$i]['address'] = 'Penarungan';
+            $companiesMatch1[$i]['category'] = 'Technology';
+
+            $companiesNotMatch1[$i]['name'] = 'BaruAja'.$namePostFix;
+            $companiesNotMatch1[$i]['address'] = 'Penarungan';
+            $companiesNotMatch1[$i]['category'] = 'Technology';
+
+            $companiesMatch1[$i]->save();
+            $companiesNotMatch1[$i]->save();
+            $namePostFix++;
+        }
+        for ($i=0; $i < count($companiesMatch2); $i++) { 
+            $companiesMatch2[$i]['name'] = 'AdiRasa'.$namePostFix;
+            $companiesMatch2[$i]['address'] = 'Penarungan';
+            $companiesMatch2[$i]['category'] = 'Technology';
+
+            $companiesNotMatch2[$i]['name'] = 'BaruAaja'.$namePostFix;
+            $companiesNotMatch2[$i]['address'] = 'Penarungan';
+            $companiesNotMatch2[$i]['category'] = 'Technology';
+
+            $companiesMatch2[$i]->save();
+            $companiesNotMatch2[$i]->save();
+            $namePostFix++;
+        }
+
+        $response1 = $this->get('/api/companies?search=AdiRasa&page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => $companiesMatch1->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=AdiRasa&page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => $companiesMatch2->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 40
+            ],
+            'errors' => null
+        ]);
+    }
+    
+    public function test_get_all_companies_with_search_parameter_matches_company_address_and_with_page_parameter(){
+        $companiesMatch1 = Company::factory()->count(20)->make();
+        $companiesNotMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch2 = Company::factory()->count(20)->make();
+        $companiesNotMatch2 = Company::factory()->count(20)->make();
+
+        $namePostFix = 0;
+        for ($i=0; $i < count($companiesMatch1); $i++) { 
+            $companiesMatch1[$i]['name'] = 'Barbara'.$namePostFix;
+            $companiesMatch1[$i]['address'] = 'Badung';
+            $companiesMatch1[$i]['category'] = 'Technology';
+
+            $companiesNotMatch1[$i]['name'] = 'Carcara'.$namePostFix;
+            $companiesNotMatch1[$i]['address'] = 'Ciroyom';
+            $companiesNotMatch1[$i]['category'] = 'Technology';
+
+            $companiesMatch1[$i]->save();
+            $companiesNotMatch1[$i]->save();
+            $namePostFix++;
+        }
+        for ($i=0; $i < count($companiesMatch2); $i++) { 
+            $companiesMatch2[$i]['name'] = 'Barbara'.$namePostFix;
+            $companiesMatch2[$i]['address'] = 'Badung';
+            $companiesMatch2[$i]['category'] = 'Technology';
+
+            $companiesNotMatch2[$i]['name'] = 'Carcara'.$namePostFix;
+            $companiesNotMatch2[$i]['address'] = 'Ciroyom';
+            $companiesNotMatch2[$i]['category'] = 'Technology';
+
+            $companiesMatch2[$i]->save();
+            $companiesNotMatch2[$i]->save();
+            $namePostFix++;
+        }
+
+        $response1 = $this->get('/api/companies?search=Badung&page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => $companiesMatch1->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=Badung&page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => $companiesMatch2->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 40
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_category_and_with_page_parameter(){
+        $companiesMatch1 = Company::factory()->count(20)->make();
+        $companiesNotMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch2 = Company::factory()->count(20)->make();
+        $companiesNotMatch2 = Company::factory()->count(20)->make();
+
+        $namePostFix = 0;
+        for ($i=0; $i < count($companiesMatch1); $i++) { 
+            $companiesMatch1[$i]['name'] = 'Pusu'.$namePostFix;
+            $companiesMatch1[$i]['address'] = 'Tabanan';
+            $companiesMatch1[$i]['category'] = 'Science';
+
+            $companiesNotMatch1[$i]['name'] = 'Dusu'.$namePostFix;
+            $companiesNotMatch1[$i]['address'] = 'Denpasar';
+            $companiesNotMatch1[$i]['category'] = 'Teknik';
+
+            $companiesMatch1[$i]->save();
+            $companiesNotMatch1[$i]->save();
+            $namePostFix++;
+        }
+        for ($i=0; $i < count($companiesMatch2); $i++) { 
+            $companiesMatch2[$i]['name'] = 'Pusu'.$namePostFix;
+            $companiesMatch2[$i]['address'] = 'Tabanan';
+            $companiesMatch2[$i]['category'] = 'Science';
+
+            $companiesNotMatch2[$i]['name'] = 'Dusu'.$namePostFix;
+            $companiesNotMatch2[$i]['address'] = 'Cisarua';
+            $companiesNotMatch2[$i]['category'] = 'Teknik';
+
+            $companiesMatch2[$i]->save();
+            $companiesNotMatch2[$i]->save();
+            $namePostFix++;
+        }
+
+        $response1 = $this->get('/api/companies?search=science&page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => $companiesMatch1->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=science&page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => $companiesMatch2->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 40
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_address_and_with_page_parameter(){
+        $companiesMatch1 = Company::factory()->count(20)->make();
+        $companiesNotMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch2 = Company::factory()->count(15)->make();
+        $companiesNotMatch2 = Company::factory()->count(20)->make();
+
+        $namePostFix = 0;
+        for ($i=0; $i < count($companiesMatch1); $i++) { 
+            $companiesMatch1[$i]['name'] = 'BangliTech'.$namePostFix;
+            $companiesMatch1[$i]['address'] = 'Bangli';
+            $companiesMatch1[$i]['category'] = 'Learning';
+
+            $companiesNotMatch1[$i]['name'] = 'Wusu'.$namePostFix;
+            $companiesNotMatch1[$i]['address'] = 'DelodPeken';
+            $companiesNotMatch1[$i]['category'] = 'Learning';
+
+            $companiesMatch1[$i]->save();
+            $companiesNotMatch1[$i]->save();
+            $namePostFix++;
+        }
+        for ($i=0; $i < count($companiesMatch2); $i++) { 
+            $companiesMatch2[$i]['name'] = 'Dusu'.$namePostFix;
+            $companiesMatch2[$i]['address'] = 'Bangli';
+            $companiesMatch2[$i]['category'] = 'Learning';
+
+            $companiesNotMatch2[$i]['name'] = 'Wusu'.$namePostFix;
+            $companiesNotMatch2[$i]['address'] = 'DelodPeken';
+            $companiesNotMatch2[$i]['category'] = 'Learning';
+
+            $companiesMatch2[$i]->save();
+            $companiesNotMatch2[$i]->save();
+            $namePostFix++;
+        }
+
+        $response1 = $this->get('/api/companies?search=bangli&page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => $companiesMatch1->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=Bangli&page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => $companiesMatch2->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 35
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_category_and_with_page_parameter(){
+        $companiesNotMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch2 = Company::factory()->count(20)->make();
+        $companiesNotMatch2 = Company::factory()->count(20)->make();
+
+        $namePostFix = 0;
+        for ($i=0; $i < 20; $i++) { 
+            $companiesNotMatch1[$i]['name'] = 'lulu'.$namePostFix;
+            $companiesNotMatch1[$i]['address'] = 'DajanBambangan';
+            $companiesNotMatch1[$i]['category'] = 'Pembelajaran';
+
+            $companiesMatch1[$i]['name'] = 'DeepCom'.$namePostFix;
+            $companiesMatch1[$i]['address'] = 'Gianyar';
+            $companiesMatch1[$i]['category'] = 'Pembelajaran';
+
+            $companiesNotMatch1[$i]->save();
+            $companiesMatch1[$i]->save();
+            $namePostFix++;
+        }
+        for ($i=0; $i < 20; $i++) { 
+            $companiesMatch2[$i]['name'] = 'yuyu'.$namePostFix;
+            $companiesMatch2[$i]['address'] = 'Balangan';
+            $companiesMatch2[$i]['category'] = 'DeepReasoning';
+
+            $companiesNotMatch2[$i]['name'] = 'bubu'.$namePostFix;
+            $companiesNotMatch2[$i]['address'] = 'Balangan';
+            $companiesNotMatch2[$i]['category'] = 'Pembelajaran';
+
+            $companiesMatch2[$i]->save();
+            $companiesNotMatch2[$i]->save();
+            $namePostFix++;
+        }
+
+        $response1 = $this->get('/api/companies?search=deep&page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => $companiesMatch1->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=Deep&page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => $companiesMatch2->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 40
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_with_search_parameter_matches_company_name_category_address_and_with_page_parameter(){
+        $companiesNotMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch1 = Company::factory()->count(20)->make();
+        $companiesMatch2 = Company::factory()->count(20)->make();
+        $companiesMatch3 = Company::factory()->count(10)->make();
+        $companiesNotMatch2 = Company::factory()->count(20)->make();
+
+        $namePostFix = 0;
+        for ($i=0; $i < 20; $i++) { 
+            $companiesNotMatch1[$i]['name'] = 'Bufalo'.$namePostFix;
+            $companiesNotMatch1[$i]['address'] = 'Mengwi';
+            $companiesNotMatch1[$i]['category'] = 'Kelautan';
+
+            $companiesMatch1[$i]['name'] = 'YoloYokato'.$namePostFix;
+            $companiesMatch1[$i]['address'] = 'Mengwi';
+            $companiesMatch1[$i]['category'] = 'Ketenagakerjaan';
+
+            $companiesNotMatch1[$i]->save();
+            $companiesMatch1[$i]->save();
+            $namePostFix++;
+        }
+        for ($i=0; $i < 20; $i++) { 
+            $companiesMatch2[$i]['name'] = 'dudu'.$namePostFix;
+            $companiesMatch2[$i]['address'] = 'Jalan yolo';
+            $companiesMatch2[$i]['category'] = 'Ketenagakerjaan';
+
+            $companiesNotMatch2[$i]['name'] = 'yuyu'.$namePostFix;
+            $companiesNotMatch2[$i]['address'] = 'Mengwi';
+            $companiesNotMatch2[$i]['category'] = 'Kelautan';
+
+            $companiesMatch2[$i]->save();
+            $companiesNotMatch2[$i]->save();
+            $namePostFix++;
+        }
+
+        for ($i=0; $i < 10; $i++) { 
+            $companiesMatch3[$i]['name'] = 'poporo'.$namePostFix;
+            $companiesMatch3[$i]['address'] = 'Jalan deli';
+            $companiesMatch3[$i]['category'] = 'Category Yolo';
+            $companiesMatch3[$i]->save();
+            $namePostFix++;
+        }
+
+        $response1 = $this->get('/api/companies?search=YoLo&page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => $companiesMatch1->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=yoLo&page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => $companiesMatch2->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => 'http://localhost/api/companies?page=3',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 40
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?search=YOLO&page=3');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 3,
+                'data' => $companiesMatch3->toArray(),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 41,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=2',
+                'to' => 50
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_without_search_parameter_and_with_page_parameter(){
+        $companies = Company::factory()->count(55)->make();
+
+        for ($i=0; $i < count($companies); $i++) { 
+            $companies[$i]['name'] = 'Test12'.$i;
+            $companies[$i]->save();
+        }
+
+        $response1 = $this->get('/api/companies?page=1');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => array_slice($companies->toArray(), 0, 20),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?page=2');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 2,
+                'data' => array_slice($companies->toArray(), 20, 20),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 21,
+                'next_page_url' => 'http://localhost/api/companies?page=3',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=1',
+                'to' => 40
+            ],
+            'errors' => null
+        ]);
+
+        $response1 = $this->get('/api/companies?page=3');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 3,
+                'data' => array_slice($companies->toArray(), 40, 15),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 41,
+                'next_page_url' => null,
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => 'http://localhost/api/companies?page=2',
+                'to' => 55
+            ],
+            'errors' => null
+        ]);
+    }
+
+    public function test_get_all_companies_without_search_parameter_and_without_page_parameter(){
+        $companies = Company::factory()->count(25)->make();
+
+        for ($i=0; $i < count($companies); $i++) { 
+            $companies[$i]['name'] = 'Kunoro'.$i;
+            $companies[$i]->save();
+        }
+
+        $response1 = $this->get('/api/companies');
+        $response1->assertOk()->assertExactJson([
+            'meta' => [
+                'code' => 200,
+                'status' => 'success',
+                'message' => 'Success Get All Companies'
+            ],
+            'data' => [
+                'current_page' => 1,
+                'data' => array_slice($companies->toArray(), 0, 20),
+                'first_page_url' => 'http://localhost/api/companies?page=1',
+                'from' => 1,
+                'next_page_url' => 'http://localhost/api/companies?page=2',
+                'path' => 'http://localhost/api/companies',
+                'per_page' => 20,
+                'prev_page_url' => null,
+                'to' => 20
+            ],
+            'errors' => null
+        ]);
+    }
+
+        // $response1 = $this->get('/api/companies?search=z123li');
+        // $response1->assertOk()->assertExactJson([
+        //     'meta' => [
+        //         'code' => 200,
+        //         'status' => 'success',
+        //         'message' => 'Success Get All Companies'
+        //     ],
+        //     'data' => [
+        //         'current_page' => 1,
+        //         'data' => [
+        //         ],
+        //         'first_page_url' => 'http://localhost/api/companies?page=1',
+        //         'from' => 1,
+        //         'next_page_url' => null,
+        //         'path' => 'http://localhost/api/companies',
+        //         'per_page' => 20,
+        //         'prev_page_url' => null,
+        //         'to' => 1
+        //     ],
+        //     'errors' => null
+        // ]);
+    // }//
+
     
     // public function test_aja(){
 
@@ -1087,18 +2088,26 @@ class CompanyControllerTest extends TestCase
     //     ]);
 
     //     Company::factory()->create([
+    //         'name' => 'Bravi',
     //         'id' => 1001,
     //         'category' => 'Technology',
     //         'profile' => '/Company/Profile/company1.jpg'
     //     ]);
 
     //     Company::factory()->create([
+    //         'name' => 'Bravo',
     //         'id' => 1002,
     //         'category' => 'Technology',
     //         'profile' => '/Company/Profile/company1.jpg'
     //     ]);
 
-    //     $response = $this->get('/api/companies');
+    //     $response = $this->get('/api/companies?search=bra&page=1');
+    //     $response->dd();
+    // }
+
+    // public function testimoni(){
+    //     $companies = Company::factory()->count(3)->create();
+    //     $response = $this->get('/api/companies?page=1');
     //     $response->dd();
     // }
 }
