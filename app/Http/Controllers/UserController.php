@@ -66,15 +66,17 @@ class UserController extends Controller
   private function updateValidator(Request $request)
   {
     return Validator::make($request->all(), [
-      'name' => 'required',
-      "address" => 'min:1',
+      'name' => 'min:5',
+      'bio' => 'min:1',
+      'address' => 'min:1',
+      "last_education" => 'min:1',
     ]);
   }
   private function confirmPasswordValidator(Request $request)
   {
     return Validator::make($request->all(), [
       'password' => 'required|min:8',
-      'confirm_password' => 'required|same:password',
+      'confirm_password' => 'required|same:password|min:8',
     ]);
   }
   private function changeProfileValidator(Request $request)
