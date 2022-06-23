@@ -757,6 +757,22 @@ class UserControllerTest extends TestCase
 
     }
 
+    public function test_change_profile_without_token(){
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $time = time();
+        $response->assertStatus(401);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileDoesNotExist(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseMissing('users', [
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+
+    }
+
 
 
     
