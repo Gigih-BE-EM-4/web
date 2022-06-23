@@ -674,6 +674,22 @@ class UserControllerTest extends TestCase
         
     }
 
+    public function test_change_password_with_unmatch_password_and_confirm_password_field(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '12345678',
+            'confirm_password' => '123456789',
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The confirm password and password must match.",$content["errors"]["confirm_password"]);
+        
+    }
+
 
 
     
