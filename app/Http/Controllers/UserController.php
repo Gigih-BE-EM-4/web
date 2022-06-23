@@ -91,7 +91,7 @@ class UserController extends Controller
   {
     if ($file = $request->hasFile('profile')) {
       $file = $request->file('profile');
-      $fileName = Str::random(10).$file->getClientOriginalName();
+      $fileName = time().$file->getClientOriginalName();
       $destinationPath = public_path().'/user/Profile';
       $file->move($destinationPath,$fileName);
       return "/User/Profile/" .$fileName;

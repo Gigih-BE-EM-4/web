@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -688,6 +689,26 @@ class UserControllerTest extends TestCase
         $content = $response->decodeResponseJson();
         $this->assertContains("The confirm password and password must match.",$content["errors"]["confirm_password"]);
         
+    }
+
+    public function test_change_profile_with_valid_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $profile = UploadedFile::fake()->image('company_profile.jpg');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $time = time();
+        $response->assertStatus(201);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileExists(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
     }
 
 
