@@ -696,7 +696,7 @@ class UserControllerTest extends TestCase
         Sanctum::actingAs(
             $user
         );
-        $profile = UploadedFile::fake()->image('company_profile.jpg');
+        $profile = UploadedFile::fake()->image('profile.jpg');
 
         $response = $this->postJson('/api/user/changeprofile', [
             'profile' => $profile,
@@ -718,7 +718,7 @@ class UserControllerTest extends TestCase
         Sanctum::actingAs(
             $user
         );
-        $profile = UploadedFile::fake()->image('company_profile.png');
+        $profile = UploadedFile::fake()->image('profile.png');
 
         $response = $this->postJson('/api/user/changeprofile', [
             'profile' => $profile,
@@ -740,7 +740,7 @@ class UserControllerTest extends TestCase
         Sanctum::actingAs(
             $user
         );
-        $profile = UploadedFile::fake()->image('company_profile.gif');
+        $profile = UploadedFile::fake()->image('profile.gif');
 
         $response = $this->postJson('/api/user/changeprofile', [
             'profile' => $profile,
@@ -758,13 +758,37 @@ class UserControllerTest extends TestCase
     }
 
     public function test_change_profile_without_token(){
-        $profile = UploadedFile::fake()->image('company_profile.jpg');
+        $profile = UploadedFile::fake()->image('profile.jpg');
 
         $response = $this->postJson('/api/user/changeprofile', [
             'profile' => $profile,
         ]);
         $time = time();
         $response->assertStatus(401);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileDoesNotExist(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseMissing('users', [
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+
+    }
+
+    public function test_change_profile_with_invalid_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $profile = UploadedFile::fake()->image('profile.pdf');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The profile must be an image.",$content["errors"]["profile"]);
+
+        $time = time();
         $fileName = $profile->getClientOriginalName();
         $this->assertFileDoesNotExist(public_path() . '/User/Profile/' . $time . $fileName);
         $this->assertDatabaseMissing('users', [
