@@ -14,6 +14,7 @@ class Project extends Model
     'images',
     'description',
     'active',
+    'isfinished',
     'company_id',
   ];
 

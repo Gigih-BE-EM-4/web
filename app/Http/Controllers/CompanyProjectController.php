@@ -170,6 +170,7 @@ class CompanyProjectController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'user_id' => 'required|integer',
+      'certificate' => 'required|file|mimes:pdf'
     ]);
 
     if ($validator->fails()) {
@@ -180,11 +181,29 @@ class CompanyProjectController extends Controller
       'project_id' => $project_id,
       'user_id' => $request->input('user_id'),
       'project_role_id' => $project_role_id,
+      'certificate' => $request->certificate
     ];
 
     $projectMember = ProjectMember::create($data)->id;
 
     return ResponseFormatter::success(ProjectMember::find($projectMember), "Project Member has been created");
+  }
+
+  public function getProjectMember(Request $request, $project_id)
+  {
+    $role = $request->input('role');
+
+    $projectMember = ProjectMember::with(['projectRole'])->where('project_id', $project_id);
+
+    if ($role) {
+      $projectMember->where('project_role_id', $role);
+    }
+
+    if ($projectMember->get()) {
+      return ResponseFormatter::success($projectMember->get(), 'Data Retrieved');
+    } else {
+      return ResponseFormatter::error(null, 'Data not found', 404, 'Data not found');
+    }
   }
 
   public function removeProjectMember($project_id, $role_id, $id)
@@ -220,6 +239,22 @@ class CompanyProjectController extends Controller
       }
     } catch (Exception $err) {
       return ResponseFormatter::error(null, "Something went wrong", 500, $err->getMessage());
+    }
+  }
+
+  public function finishProject($project_id)
+  {
+    $project = Project::find($project_id);
+    if (Auth::user()->company_id != $project->company_id) {
+      return ResponseFormatter::error(null, 'You are not in this company', 401, "You are not in this company");
+    }
+
+    $project->update(['isfinished' => 1]);
+
+    if ($project->wasChanged()) {
+      return ResponseFormatter::success($project, $project->name . " is Done");
+    } else {
+      return ResponseFormatter::error(null, "Something Went Wrong", 400, "Something Went Wrong");
     }
   }
 }

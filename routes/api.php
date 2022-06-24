@@ -63,7 +63,10 @@ Route::group(['middleware' => ['auth:sanctum', 'hasCompany']], function () {
   Route::post('/company/project/{project_id}/role/{role_id}', [CompanyProjectController::class, 'updateProjectRole']);
 
   Route::post('/company/project/{project_id}/{project_role_id}/project-member/add', [CompanyProjectController::class, 'addProjectMember']);
+  Route::get('/company/project/{project_id}/project-member', [CompanyProjectController::class, 'getProjectMember']);
   Route::delete('/company/project/{project_id}/role/{role_id}/remove/{id}', [CompanyProjectController::class, 'removeProjectMember']);
 
   Route::get('company/project/{project_id}/role/{role_id}/applicants', [CompanyProjectController::class, 'getAllApplicants']);
+
+  Route::post('/company/project/{project_id}/finish', [CompanyProjectController::class, 'finishProject']);
 });
