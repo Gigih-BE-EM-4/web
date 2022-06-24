@@ -285,4 +285,8 @@ class UserController extends Controller
       return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
     }
   }
+  
+  public function getAllCertificates(){
+    $user = Auth::user();
+  }
 }
