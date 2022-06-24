@@ -44,6 +44,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('user/changepassword', [UserController::class, 'changepassword'])->name("user.change.password");
   Route::post('user/changeprofile', [UserController::class, 'changeProfile'])->name("user.change.profile");
   Route::get('user/ping', [UserController::class, 'ping'])->name("user.ping");
+
+
+  Route::post('user/project/apply', [UserController::class, 'applyProject'])->name("user.project.apply");
 });
 
 Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");
