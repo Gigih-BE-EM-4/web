@@ -305,10 +305,8 @@ class UserController extends Controller
     if($data){
       $projects = [];
       foreach($data as $x){
-        $temp["project_id"] = $x->project->id;
-        $temp["project_name"] = $x->project->name;
-        $temp["project_role"] = $x->projectRole->name;
-        $temp["project_role_desc"] = $x->projectRole->description;
+        $temp["project"] = $x->project;
+        $temp["project"]["role"] = $x->projectRole;
         array_push($projects,$temp);
       }
       return ResponseFormatter::success($projects, "success", 200, 'success');
