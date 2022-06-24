@@ -41,7 +41,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('user', [UserController::class, 'update'])->name("user.update");
   Route::get('user/verify', [UserController::class, 'isVerify'])->name("user.isVerify");
   Route::post('user/logout', [UserController::class, 'logout'])->name("user.logout");
+  Route::post('user/changepassword', [UserController::class, 'changepassword'])->name("user.change.password");
+  Route::post('user/changeprofile', [UserController::class, 'changeProfile'])->name("user.change.profile");
   Route::get('user/ping', [UserController::class, 'ping'])->name("user.ping");
+  Route::get('user/certificates', [UserController::class, 'getAllCertificates'])->name("user.certificates");
+  Route::get('user/projects', [UserController::class, 'getAllProject'])->name("user.certificates");
+
+
+  Route::post('user/project/apply', [UserController::class, 'applyProject'])->name("user.project.apply");
 });
 
 Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");

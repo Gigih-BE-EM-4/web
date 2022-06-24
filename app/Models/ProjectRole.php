@@ -17,9 +17,9 @@ class ProjectRole extends Model
     'extra_question',
   ];
 
-  public function projects()
+  public function project()
   {
-    return $this->hasMany('App\Models\Project');
+    return $this->belongsTo('App\Models\Project');
   }
 
   public function projectMembers()

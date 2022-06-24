@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
@@ -441,15 +442,362 @@ class UserControllerTest extends TestCase
         $this->assertEquals($content["errors"],"user not found");
 
     }
-    //if email isnt email
-    public function test_forgot_password_with_invalid_email(){
-        $response = $this->get('/api/user/forgot-password/test');
-        $content = $response->decodeResponseJson();
-        $response->assertStatus(422);
-        $this->assertContains("Email not valid",$content["errors"]["email"], );
 
+    public function test_update_user_with_valid_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user', [
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+    }
+
+    public function test_update_user_without_token(){
+        $response = $this->postJson('/api/user', [
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+        $response->assertStatus(401);
+        $this->assertDatabaseMissing('users', [
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+    }
+
+    public function test_update_user_without_name(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user', [
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => $user->name,
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+    }
+
+    public function test_update_user_without_bio(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user', [
+            'name' => 'Rifaldy Elninoru',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Rifaldy Elninoru',
+            'bio' => $user->bio,
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+        
+    }
+    public function test_update_user_without_address(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user', [
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'last_education' => 'SMK',
+        ]);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => $user->address,
+            'last_education' => 'SMK',
+        ]);
+    }
+    
+    public function test_update_user_without_last_education(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user', [
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+        ]);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => $user->last_education,
+        ]);
+    }
+
+    public function test_update_user_with_other_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user', [
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+            'verify' => 'test',
+            'password' => 'test',
+        ]);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'Rifaldy Elninoru',
+            'bio' => 'Hello Im rifaldy',
+            'address' => 'jl.x',
+            'last_education' => 'SMK',
+        ]);
+        $this->assertDatabaseMissing('users', [
+            'verify' => 'test',
+        ]);
+        $this->assertDatabaseMissing('users', [
+            'password' => 'test',
+        ]);
+    }
+
+    public function test_change_password_with_valid_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '12345678',
+            'confirm_password' => '12345678',
+        ]);
+        $response->assertStatus(201);
+        
+        // $responses = $this->postJson('/api/user/login', [
+        //     'username' => $user->username,
+        //     'password' => '12345678',
+        // ]);
+
+        // $responses->assertStatus(201);
+    }
+    public function test_change_password_with_invalid_token(){
+        
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '12345678',
+            'confirm_password' => '12345678',
+        ]);
+        $response->assertStatus(401);
+        
+    }
+
+    public function test_change_password_without_password_field(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'confirm_password' => '12345678',
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The password field is required.",$content["errors"]["password"]);
+    }
+    public function test_change_password_without_invalid_password_field(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '111',
+            'confirm_password' => '12345678',
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The password must be at least 8 characters.",$content["errors"]["password"]);
+    }
+
+    public function test_change_password_without_confirm_password_field(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '12345678',
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The confirm password field is required.",$content["errors"]["confirm_password"]);
+    }
+
+    public function test_change_password_with_invalid_confirm_password_field(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '12345678',
+            'confirm_password' => '111',
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The confirm password must be at least 8 characters.",$content["errors"]["confirm_password"]);
+        
+    }
+
+    public function test_change_password_with_unmatch_password_and_confirm_password_field(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $response = $this->postJson('/api/user/changepassword', [
+            'password' => '12345678',
+            'confirm_password' => '123456789',
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The confirm password and password must match.",$content["errors"]["confirm_password"]);
+        
+    }
+
+    public function test_change_profile_with_valid_jpg_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $profile = UploadedFile::fake()->image('profile.jpg');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $time = time();
+        $response->assertStatus(201);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileExists(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+        unlink(public_path() . '/User/Profile/' . $time . $fileName);
 
     }
+
+    public function test_change_profile_with_valid_png_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $profile = UploadedFile::fake()->image('profile.png');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $time = time();
+        $response->assertStatus(201);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileExists(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+        unlink(public_path() . '/User/Profile/' . $time . $fileName);
+
+    }
+
+    public function test_change_profile_with_valid_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $profile = UploadedFile::fake()->image('profile.gif');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $time = time();
+        $response->assertStatus(201);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileExists(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+        unlink(public_path() . '/User/Profile/' . $time . $fileName);
+
+    }
+
+    public function test_change_profile_without_token(){
+        $profile = UploadedFile::fake()->image('profile.jpg');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $time = time();
+        $response->assertStatus(401);
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileDoesNotExist(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseMissing('users', [
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+
+    }
+
+    public function test_change_profile_with_invalid_data(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $profile = UploadedFile::fake()->image('profile.pdf');
+
+        $response = $this->postJson('/api/user/changeprofile', [
+            'profile' => $profile,
+        ]);
+        $response->assertStatus(422);
+
+        $content = $response->decodeResponseJson();
+        $this->assertContains("The profile must be an image.",$content["errors"]["profile"]);
+
+        $time = time();
+        $fileName = $profile->getClientOriginalName();
+        $this->assertFileDoesNotExist(public_path() . '/User/Profile/' . $time . $fileName);
+        $this->assertDatabaseMissing('users', [
+            'profile' =>  '/User/Profile/' . $time . $fileName,
+        ]);
+
+    }
+
+
 
     
 
