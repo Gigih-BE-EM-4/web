@@ -53,7 +53,7 @@ class CompanyProjectController extends Controller
 
     if ($request->hasFile('image')) {
       $file = $request->file('image');
-      $fileName = Str::random(10) . '.' . $file->getClientOriginalExtension();
+      $fileName = time() . str_replace(" ", "_", $file->getClientOriginalName());
       $file->move(public_path('images/project'), $fileName);
       $validatedData['images'] =  "\images\project\\" . $fileName;
     } else {
