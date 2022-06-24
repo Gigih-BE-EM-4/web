@@ -69,4 +69,5 @@ Route::group(['middleware' => ['auth:sanctum', 'hasCompany']], function () {
   Route::get('company/project/{project_id}/role/{role_id}/applicants', [CompanyProjectController::class, 'getAllApplicants']);
 
   Route::post('/company/project/{project_id}/finish', [CompanyProjectController::class, 'finishProject']);
+  Route::post('/company/project/{iproject_id}/project-member/{project_member_id}/send-certificate', [CompanyProjectController::class, 'sendCertificate']);
 });

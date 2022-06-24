@@ -170,7 +170,7 @@ class CompanyProjectController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'user_id' => 'required|integer',
-      'certificate' => 'required|file|mimes:pdf'
+      'certificate' => 'nullable|required|file|mimes:pdf'
     ]);
 
     if ($validator->fails()) {
@@ -253,6 +253,28 @@ class CompanyProjectController extends Controller
 
     if ($project->wasChanged()) {
       return ResponseFormatter::success($project, $project->name . " is Done");
+    } else {
+      return ResponseFormatter::error(null, "Something Went Wrong", 400, "Something Went Wrong");
+    }
+  }
+
+  public function sendCertificate(Request $request, $project_id, $project_member_id)
+  {
+    $validator = Validator::make($request->all(), [
+      "certificate" => "required|file|mimes:pdf"
+    ]);
+    if ($validator->fails()) {
+      return ResponseFormatter::error(null, 'Validation Error', 400, $validator->errors());
+    }
+    $certificate = asset("storage/" . $request->file('certificate')->store('certificates'));
+
+    $projectMember = ProjectMember::where("id", $project_member_id)
+      ->where("project_id", $project_id);
+
+
+
+    if ($projectMember->update(["certificate" => $certificate])) {
+      return ResponseFormatter::success($projectMember->find($project_member_id), "Certificate has been sent");
     } else {
       return ResponseFormatter::error(null, "Something Went Wrong", 400, "Something Went Wrong");
     }
