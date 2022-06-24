@@ -290,9 +290,28 @@ class UserController extends Controller
   public function getAllCertificates(){
     //insert into project_members (project_id,project_role_id,user_id,certificate) VALUES (1,1,27,'test.pdf')
     $user = Auth::user();
-    $data = ProjectMember::where("user_id",$user->id)->where("certificate","!=","")->get();
+    $data = ProjectMember::select("certificate")->where("user_id",$user->id)->where("certificate","!=","")->get();
     if($data){
       return ResponseFormatter::success($data, "success", 200, 'success');
+    }else{
+      return ResponseFormatter::error(null, "this user dosent have certificate", 404, "this user dosent have certificate");
+    }
+  }
+
+  public function getAllProject(){
+    //insert into project_members (project_id,project_role_id,user_id,certificate) VALUES (1,1,27,'test.pdf')
+    $user = Auth::user();
+    $data = ProjectMember::where("user_id",$user->id)->where("certificate","!=","")->get();
+    if($data){
+      $projects = [];
+      foreach($data as $x){
+        $temp["project_id"] = $x->project->id;
+        $temp["project_name"] = $x->project->name;
+        $temp["project_role"] = $x->projectRole->name;
+        $temp["project_role_desc"] = $x->projectRole->description;
+        array_push($projects,$temp);
+      }
+      return ResponseFormatter::success($projects, "success", 200, 'success');
     }else{
       return ResponseFormatter::error(null, "this user dosent have certificate", 404, "this user dosent have certificate");
     }
