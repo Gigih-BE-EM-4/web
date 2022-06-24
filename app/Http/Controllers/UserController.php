@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apply;
+use App\Models\ProjectMember;
 use App\Models\ProjectRole;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -287,6 +288,13 @@ class UserController extends Controller
   }
   
   public function getAllCertificates(){
+    //insert into project_members (project_id,project_role_id,user_id,certificate) VALUES (1,1,27,'test.pdf')
     $user = Auth::user();
+    $data = ProjectMember::where("user_id",$user->id)->where("certificate","!=","")->get();
+    if($data){
+      return ResponseFormatter::success($data, "success", 200, 'success');
+    }else{
+      return ResponseFormatter::error(null, "this user dosent have certificate", 404, "this user dosent have certificate");
+    }
   }
 }
