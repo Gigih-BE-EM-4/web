@@ -839,6 +839,20 @@ class UserControllerTest extends TestCase
         $this->assertEquals("Unauthenticated.",$content["errors"]);
     }
 
+    public function test_get_all_user_certificate_if_user_dosent_have_certificate(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->get('/api/user/certificates');
+
+        $response->assertStatus(200);
+        $content = $response->decodeResponseJson();
+
+        $this->assertEmpty($content["data"]);
+    }
+
     
 
     
