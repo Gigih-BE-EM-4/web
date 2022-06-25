@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\ProjectMember;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -795,6 +796,47 @@ class UserControllerTest extends TestCase
             'profile' =>  '/User/Profile/' . $time . $fileName,
         ]);
 
+    }
+
+    // 'project_id',
+    // 'project_role_id',
+    // 'user_id',
+    // 'certificate',
+    public function test_get_all_user_certificate(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $certificate= ["test.pdf","test1.pdf"];
+        ProjectMember::create([
+            'project_id' => 1,
+            'project_role_id' => 1,
+            'user_id' => $user->id,
+            'certificate' => $certificate[0],
+        ]);
+        ProjectMember::create([
+            'project_id' => 2,
+            'project_role_id' => 2,
+            'user_id' => $user->id,
+            'certificate' => $certificate[1],
+        ]);
+
+        $response = $this->get('/api/user/certificates');
+
+        $response->assertStatus(200);
+        $content = $response->decodeResponseJson();
+
+        $this->assertContains($certificate[0],$content["data"][0]);
+        $this->assertContains($certificate[1],$content["data"][1]);
+    }
+
+    public function test_get_all_user_certificate_without_token(){
+        $response = $this->get('/api/user/certificates');
+
+        $response->assertStatus(401);
+        $content = $response->decodeResponseJson();
+
+        $this->assertEquals("Unauthenticated.",$content["errors"]);
     }
 
 
