@@ -918,6 +918,30 @@ class UserControllerTest extends TestCase
             
     }
 
+    public function test_get_all_user_projects_without_token(){
+        
+        
+        $response = $this->get('/api/user/projects');
+
+        $response->assertStatus(401);
+        $content = $response->decodeResponseJson();
+
+        $this->assertEquals("Unauthenticated.",$content["errors"]);
+    }
+    public function test_get_all_user_projects_if_user_dosent_have_projects(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+
+        $response = $this->get('/api/user/projects');
+
+        $response->assertStatus(200);
+        $content = $response->decodeResponseJson();
+
+        $this->assertEmpty($content["data"]);
+    }
+
     
 
     
