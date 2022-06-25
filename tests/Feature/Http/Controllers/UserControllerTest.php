@@ -839,8 +839,6 @@ class UserControllerTest extends TestCase
         $this->assertEquals("Unauthenticated.",$content["errors"]);
     }
 
-
-
     
 
     
