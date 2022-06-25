@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\ProjectMember;
+use App\Models\Project;
+use App\Models\ProjectRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
@@ -851,6 +853,69 @@ class UserControllerTest extends TestCase
         $content = $response->decodeResponseJson();
 
         $this->assertEmpty($content["data"]);
+    }
+    public function test_get_all_user_projects(){
+        $user = User::factory()->create();
+        Sanctum::actingAs(
+            $user
+        );
+        $project = Project::factory()->create();
+        $project2 = Project::factory()->create();
+        $project_role = ProjectRole::factory()->create([
+            "project_id" => $project->id,
+        ]);
+        $project_role2 = ProjectRole::factory()->create([
+            "project_id" => $project2->id,
+        ]);
+
+        ProjectMember::create([
+            'project_id' => $project->id,
+            'project_role_id' => $project_role->id,
+            'user_id' => $user->id,
+            'certificate' => "test.pdf",
+        ]);
+
+        ProjectMember::create([
+            'project_id' => $project2->id,
+            'project_role_id' => $project_role2->id,
+            'user_id' => $user->id,
+            'certificate' => "test2.pdf",
+        ]);
+
+        $response = $this->get('/api/user/projects');
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(200);
+        $this->assertEquals($project->id,$content["data"][0]["project"]["id"]);
+        $this->assertEquals($project->name,$content["data"][0]["project"]["name"]);
+        $this->assertEquals($project->images,$content["data"][0]["project"]["images"]);
+        $this->assertEquals($project->description,$content["data"][0]["project"]["description"]);
+        $this->assertEquals($project->active,$content["data"][0]["project"]["active"]);
+        $this->assertEquals($project->isfinished,$content["data"][0]["project"]["isfinished"]);
+        $this->assertEquals($project->company_id,$content["data"][0]["project"]["company_id"]);
+
+        $this->assertEquals($project_role->id,$content["data"][0]["project"]["role"]["id"]);
+        $this->assertEquals($project_role->name,$content["data"][0]["project"]["role"]["name"]);
+        $this->assertEquals($project_role->quota,$content["data"][0]["project"]["role"]["quota"]);
+        $this->assertEquals($project_role->description,$content["data"][0]["project"]["role"]["description"]);
+        $this->assertEquals($project_role->project_id,$content["data"][0]["project"]["role"]["project_id"]);
+        $this->assertEquals($project_role->extra_question,$content["data"][0]["project"]["role"]["extra_question"]);
+
+        $this->assertEquals($project2->id,$content["data"][1]["project"]["id"]);
+        $this->assertEquals($project2->name,$content["data"][1]["project"]["name"]);
+        $this->assertEquals($project2->images,$content["data"][1]["project"]["images"]);
+        $this->assertEquals($project2->description,$content["data"][1]["project"]["description"]);
+        $this->assertEquals($project2->active,$content["data"][1]["project"]["active"]);
+        $this->assertEquals($project2->isfinished,$content["data"][1]["project"]["isfinished"]);
+        $this->assertEquals($project2->company_id,$content["data"][1]["project"]["company_id"]);
+
+        $this->assertEquals($project_role2->id,$content["data"][1]["project"]["role"]["id"]);
+        $this->assertEquals($project_role2->name,$content["data"][1]["project"]["role"]["name"]);
+        $this->assertEquals($project_role2->quota,$content["data"][1]["project"]["role"]["quota"]);
+        $this->assertEquals($project_role2->description,$content["data"][1]["project"]["role"]["description"]);
+        $this->assertEquals($project_role2->project_id,$content["data"][1]["project"]["role"]["project_id"]);
+        $this->assertEquals($project_role2->extra_question,$content["data"][1]["project"]["role"]["extra_question"]);
+            
     }
 
     
