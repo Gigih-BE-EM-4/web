@@ -221,6 +221,41 @@ class CompanyProjectController extends Controller
     }
   }
 
+  private function UploadCVValidator(Request $request)
+  {
+    return Validator::make($request->all(), [
+      'cv' => 'mimes:pdf|max:2048',
+      'project_role_id' => 'required',
+      'extra_answer' => 'array',
+    ]);
+  }
+  public function applyProject(Request $request)
+  {
+    $validate = $this->UploadCVValidator($request);
+    if (!$validate->fails()) {
+      $x = $this->uploadCV($request);
+      if ($x != "") {
+        $project_role = ProjectRole::find($request->project_role_id);
+        $apply = Apply::create([
+          "user_id" => Auth::user()->id,
+          "project_id" => $project_role->project->id,
+          "project_role_id" => $request->project_role_id,
+          "cv" => $x,
+          "extra_answer" => implode(",", $request->extra_answer),
+        ]);
+        if ($apply) {
+          return ResponseFormatter::success($apply, "apply has been sent", 200, 'success');
+        } else {
+          return ResponseFormatter::error(null, "Gagal mengirim apply, silahkan coba beberapa saat lagi", 400, "fail to send applicant");
+        }
+      } else {
+        return ResponseFormatter::error(null, "Unprocessable Entity", 422, "CV not uploaded");
+      }
+    } else {
+      return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
+    }
+  }
+
   public function getAllApplicants(Request $request, $project_id, $role_id)
   {
     try {

@@ -5,6 +5,7 @@ use App\Http\Controllers\CompanyProjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Tests\Feature\Http\Controllers\CompanyProjectTest;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +49,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('user/projects', [UserController::class, 'getAllProject'])->name("user.certificates");
 
 
-  Route::post('user/project/apply', [UserController::class, 'applyProject'])->name("user.project.apply");
+  Route::post('user/project/apply', [CompanyProjectController::class, 'applyProject'])->name("user.project.apply");
 });
 
 Route::get('user/{id}', [UserController::class, 'detail'])->name("user.detail");

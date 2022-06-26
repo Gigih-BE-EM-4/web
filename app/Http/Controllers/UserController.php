@@ -48,14 +48,14 @@ class UserController extends Controller
         "verify" => Str::random(40),
       ]);
       if ($user) {
-        if(env("SEND_EMAIL")){
-          \Mail::to($request->email)->send(new \App\Mail\RegisterMail($user->name,$user->verify));
+        if (env("SEND_EMAIL")) {
+          \Mail::to($request->email)->send(new \App\Mail\RegisterMail($user->name, $user->verify));
           if (\Mail::failures()) {
             return ResponseFormater::error(null, "Email Not Sended", 400, Mail::failures());
-          }else{
+          } else {
             return ResponseFormatter::success($user, "user has been created", 201, 'success');
           }
-        }else{
+        } else {
           return ResponseFormatter::success($user, "user has been created", 201, 'success');
         }
       } else {
@@ -88,24 +88,17 @@ class UserController extends Controller
       'profile' => 'image|mimes:png,jpg,gif|max:2048',
     ]);
   }
-  private function UploadCVValidator(Request $request)
-  {
-    return Validator::make($request->all(), [
-      'cv' => 'mimes:pdf|max:2048',
-      'project_role_id' => 'required',
-      'extra_answer' => 'array',
-    ]);
-  }
+
 
 
   private function uploadImage($request)
   {
     if ($file = $request->hasFile('profile')) {
       $file = $request->file('profile');
-      $fileName = time().$file->getClientOriginalName();
-      $destinationPath = public_path().'/user/Profile';
-      $file->move($destinationPath,$fileName);
-      return "/User/Profile/" .$fileName;
+      $fileName = time() . $file->getClientOriginalName();
+      $destinationPath = public_path() . '/user/Profile';
+      $file->move($destinationPath, $fileName);
+      return "/User/Profile/" . $fileName;
     } else {
       return "";
     }
@@ -114,10 +107,10 @@ class UserController extends Controller
   {
     if ($file = $request->hasFile('cv')) {
       $file = $request->file('cv');
-      $fileName = time().$file->getClientOriginalName();
-      $destinationPath = public_path().'/user/cv/'.Auth::user()->id."/";
-      $file->move($destinationPath,$fileName);
-      return "/User/cv/".Auth::user()->id."/" .$fileName;
+      $fileName = time() . $file->getClientOriginalName();
+      $destinationPath = public_path() . '/user/cv/' . Auth::user()->id . "/";
+      $file->move($destinationPath, $fileName);
+      return "/User/cv/" . Auth::user()->id . "/" . $fileName;
     } else {
       return "";
     }
@@ -154,25 +147,24 @@ class UserController extends Controller
       return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
     }
   }
-  public function changeProfile(Request $request){
+  public function changeProfile(Request $request)
+  {
     $validate = $this->changeProfileValidator($request);
-    if(!$validate->fails()){
+    if (!$validate->fails()) {
       $x = $this->uploadImage($request);
-      if($x != ""){
+      if ($x != "") {
         $user = Auth::User()->update(['profile' => $x]);
-        if($user){
+        if ($user) {
           return ResponseFormatter::success($user, "user has been updated", 201, 'success');
-        }else{
+        } else {
           return ResponseFormatter::error(null, "User not updated", 400, "internal error");
         }
-      }else{
+      } else {
         return ResponseFormatter::error(null, "Unprocessable Entity", 422, "image not uploaded");
       }
-    }else{
+    } else {
       return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
     }
-   
-    
   }
   public function changePassword(Request $request)
   {
@@ -224,7 +216,7 @@ class UserController extends Controller
 
   public function forgot($email)
   {
-    if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
       $user = User::where('email', $email)->first();
       if ($user) {
         // $password = Str::random(10);
@@ -232,20 +224,19 @@ class UserController extends Controller
         $hash = bcrypt($password);
         //ceritanya ngirim email
         $sendEmail = true;
-        if($sendEmail){
+        if ($sendEmail) {
           $user->password = $hash;
           $user->save();
           return ResponseFormatter::success($user, "user has been reset", 200, 'success');
-        }else{
+        } else {
           return ResponseFormatter::error(null, "Gagal mengirim email, silahkan coba beberapa saat lagi", 404, "fail to send email");
         }
       } else {
         return ResponseFormatter::error(null, "User Not Found", 404, "user not found");
       }
-    }else{
+    } else {
       return ResponseFormatter::error(null, "Unprocessable Entity", 422, ["email" => ["Email not valid"]]);
     }
-    
   }
 
 
@@ -258,59 +249,38 @@ class UserController extends Controller
     }
   }
 
-  public function ping(){
-      return ResponseFormatter::success(null, "user is logged in", 200, 'success');
+  public function ping()
+  {
+    return ResponseFormatter::success(null, "user is logged in", 200, 'success');
   }
-  public function applyProject(Request $request){
-    $validate = $this->UploadCVValidator($request);
-    if(!$validate->fails()){
-      $x = $this->uploadCV($request);
-      if($x != ""){
-        $project_role = ProjectRole::find($request->project_role_id);
-        $apply = Apply::create([
-          "user_id" => Auth::user()->id,
-          "project_id" => $project_role->project->id,
-          "project_role_id" => $request->project_role_id,
-          "cv" => $x,
-          "extra_answer" => implode(",",$request->extra_answer),
-        ]);
-        if($apply){
-          return ResponseFormatter::success($apply, "apply has been sent", 200, 'success');
-        }else{
-          return ResponseFormatter::error(null, "Gagal mengirim apply, silahkan coba beberapa saat lagi", 400, "fail to send applicant");
-        }
-      }else{
-        return ResponseFormatter::error(null, "Unprocessable Entity", 422, "CV not uploaded");
-      }
-    }else{
-      return ResponseFormatter::error(null, "Unprocessable Entity", 422, $validate->errors());
-    }
-  }
-  
-  public function getAllCertificates(){
+
+
+  public function getAllCertificates()
+  {
     //insert into project_members (project_id,project_role_id,user_id,certificate) VALUES (1,1,27,'test.pdf')
     $user = Auth::user();
-    $data = ProjectMember::select("certificate")->where("user_id",$user->id)->where("certificate","!=","")->get();
-    if($data){
+    $data = ProjectMember::select("certificate")->where("user_id", $user->id)->where("certificate", "!=", "")->get();
+    if ($data) {
       return ResponseFormatter::success($data, "success", 200, 'success');
-    }else{
+    } else {
       return ResponseFormatter::error(null, "this user dosent have certificate", 404, "this user dosent have certificate");
     }
   }
 
-  public function getAllProject(){
+  public function getAllProject()
+  {
     //insert into project_members (project_id,project_role_id,user_id,certificate) VALUES (1,1,27,'test.pdf')
     $user = Auth::user();
-    $data = ProjectMember::where("user_id",$user->id)->where("certificate","!=","")->get();
-    if($data){
+    $data = ProjectMember::where("user_id", $user->id)->where("certificate", "!=", "")->get();
+    if ($data) {
       $projects = [];
-      foreach($data as $x){
+      foreach ($data as $x) {
         $temp["project"] = $x->project;
         $temp["project"]["role"] = $x->projectRole;
-        array_push($projects,$temp);
+        array_push($projects, $temp);
       }
       return ResponseFormatter::success($projects, "success", 200, 'success');
-    }else{
+    } else {
       return ResponseFormatter::error(null, "this user dosent have certificate", 404, "this user dosent have certificate");
     }
   }
