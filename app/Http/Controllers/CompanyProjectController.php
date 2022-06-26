@@ -170,7 +170,7 @@ class CompanyProjectController extends Controller
   {
     $validator = Validator::make($request->all(), [
       'user_id' => 'required|integer',
-      'certificate' => 'nullable|required|file|mimes:pdf'
+      'certificate' => 'nullable|file|mimes:pdf'
     ]);
 
     if ($validator->fails()) {
