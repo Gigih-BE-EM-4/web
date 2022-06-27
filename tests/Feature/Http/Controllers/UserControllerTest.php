@@ -304,6 +304,24 @@ class UserControllerTest extends TestCase
         $this->assertNull($content["errors"]);
     }
 
+    public function test_login_with_valid_data_but_user_not_verified(){
+        $user = User::factory()->create([
+            'verify' => "ihwbfuiwbeiflewf",
+            'password' => bcrypt("12345678")
+        ]);
+        $response = $this->postJson('/api/user/login', [
+            'username' => $user->email,
+            'password' => '12345678',
+            
+        ]);
+        $content = $response->decodeResponseJson();
+
+        $response->assertStatus(401);
+        $this->assertNull($content["data"]);
+        $this->assertEquals("user not verified",$content["errors"]);
+
+    }
+
     public function test_login_with_invalid_username(){
         $this->postJson('/api/user/register', [
             'name' => 'Rifaldy Elninoru',
