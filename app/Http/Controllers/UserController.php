@@ -128,9 +128,13 @@ class UserController extends Controller
     $validate = $this->loginValidator($request);
     if (!$validate->fails()) {
       if (Auth::attempt(['email' => $request->username, 'password' => $request->password]) || Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-        $user = Auth::user();
-        $token = $user->createToken('CPToken')->plainTextToken;
-        return ResponseFormatter::success(["token" => $token], "user has been logged in", 201, 'success');
+        if(Auth::user()->verify == null){
+          $user = Auth::user();
+          $token = $user->createToken('CPToken')->plainTextToken;
+          return ResponseFormatter::success(["token" => $token], "user has been logged in", 201, 'success');
+        }else{
+          return ResponseFormatter::error(null, "Please Check Email for verify your account", 401, "user not verified");
+        }
       } else {
         return ResponseFormatter::error(null, "User not authenticated", 401, "user/password not match");
       }

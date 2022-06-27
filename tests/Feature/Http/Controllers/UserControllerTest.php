@@ -265,18 +265,15 @@ class UserControllerTest extends TestCase
 
     public function test_login_with_valid_username_and_password()
     {
-        $this->postJson('/api/user/register', [
-            'name' => 'Rifaldy Elninoru',
-            'email' => 'rifaldy@gmail.com',
-            'username' => 'rifaldy',
-            'address' => 'Jakarta Selatan',
-            'password' => 'rifaldi111',
-            'confirm_password' => 'rifaldi111',
+
+        $user = User::factory()->create([
+            'verify' => null,
+            'password' => bcrypt("12345678")
         ]);
 
         $response = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy',
-            'password' => 'rifaldi111',
+            'username' => $user->username,
+            'password' => "12345678",
         ]);
         $content = $response->decodeResponseJson();
 
@@ -292,17 +289,13 @@ class UserControllerTest extends TestCase
         // $response->assertStatus(200);
     }
     public function test_login_with_valid_email_and_password(){
-        $this->postJson('/api/user/register', [
-            'name' => 'Rifaldy Elninoru',
-            'email' => 'rifaldy@gmail.com',
-            'username' => 'rifaldy',
-            'address' => 'Jakarta Selatan',
-            'password' => 'rifaldi111',
-            'confirm_password' => 'rifaldi111',
+        $user = User::factory()->create([
+            'verify' => null,
+            'password' => bcrypt("12345678")
         ]);
         $response = $this->postJson('/api/user/login', [
-            'username' => 'rifaldy@gmail.com',
-            'password' => 'rifaldi111',
+            'username' => $user->email,
+            'password' => '12345678',
         ]);
         $content = $response->decodeResponseJson();
 
