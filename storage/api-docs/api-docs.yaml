@@ -1,0 +1,651 @@
+swagger: "2.0"
+info:
+  description: "CariPengalaman.com API documentation"
+  version: "1.0.0"
+  title: "CariPengalaman.com"
+
+basePath: "/api"
+tags:
+- name: "User"
+  description: "Operations about user"
+- name: "Company"
+  description: "Operations about company"
+- name: "Project"
+  description: "Operations about project"
+- name: "ProjectRole"
+  description: "Operations about project role"
+- name: "ProjectMember"
+  description: "Operations about project member"
+schemes:
+- "https"
+- "http"
+paths:
+  /user/register:
+    post:
+      tags:
+      - "User"
+      summary: "Register user into the system"
+      description: ""
+      operationId: "registerUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Register user into the system"
+        required: true
+        schema:
+          $ref: "#/definitions/UserRequest"
+      responses:
+        "201":
+          description: "user has been created"
+        "400":
+          description: "User not created"
+        "422":
+          description: "Unprocessable Entity"
+  /user/login:
+    post:
+      tags:
+      - "User"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        "201":
+          description: "successful operation"
+          schema:
+            type: "string"
+          headers:
+            X-Rate-Limit:
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+        "401":
+          description: "user/password not match"
+        "422":
+          description: "user not found"
+  /user/logout:
+    post:
+      tags:
+      - "User"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /user/{id}:
+    get:
+      tags:
+      - "User"
+      summary: "Get user detail by user id"
+      description: ""
+      operationId: "getUserById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "insert user Id"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        "404":
+          description: "User not found"
+      security:
+        - api_key: []
+    post:
+      tags:
+      - "User"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "User id"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/UserRequest"
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: user has been updated.
+        "400":
+          description: "User not updated"
+        "422":
+          description: "Unprocessable Entity"
+  
+  /companies:
+    get:
+      tags:
+      - "Company"
+      summary: "Get list of companies"
+      description: "Returns list of company"
+      operationId: "getCompany"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Success Get All Companies"
+          schema:
+            $ref: "#/definitions/CompanyResponse"
+        "404":
+          description: "Company Not Found"
+  /companies/{company_id}:
+    get:
+      tags:
+      - "Company"
+      summary: "Get companies detail by id"
+      description: "Return Company Detail"
+      operationId: "getCompanyById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "company_id"
+        in: "path"
+        description: ""
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Success Get Company Detail"
+          schema:
+            $ref: "#/definitions/Company"
+        "404":
+          description: "Company Detail Not Found"
+  /company/project:
+    post:
+      tags:
+      - "Project"
+      summary: "Create new Project"
+      description: "This can only be done by company"
+      operationId: "createProject"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created company object"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectRequest"
+      responses:
+        "200":
+          description: "Project has been created"
+        "400":
+          description: "Validation Error"
+        "401":
+          description: "You are not in this company"
+      security:
+        - api_key: []
+  /company/project/{id}:
+    get:
+      tags:
+      - "Project"
+      summary: "Get project detail by id"
+      description: "Return Project Detail"
+      operationId: "getProjectById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Project id"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Data Successfully Retrieved"
+          schema:
+            $ref: "#/definitions/Project"
+        "404":
+          description: "Project Not Found"
+      security:
+        - api_key: []
+    post:
+      tags:
+      - "Project"
+      summary: "Update existing project"
+      description: "Returns updated project data"
+      operationId: "updateProject"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Project Id"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectRequest"
+      responses:
+        "200":
+          description: "Project has been updated"
+        "400":
+          description: "Validation Error"
+        "401":
+          description: "You are not in this company"
+        "404":
+          description: "Project not found"
+      security:
+        - api_key: []
+  /user/company/projects:
+    get:
+      tags:
+      - "Project"
+      summary: "Get All Project"
+      description: "Return list of Project"
+      operationId: "getProject"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Data Successfully Retrieved"
+          schema:
+            $ref: "#/definitions/Project"
+        "404":
+          description: "Project Not Found"
+      security:
+        - api_key: []
+
+  /company/project/{id}/role:
+    post:
+      tags:
+      - "ProjectRole"
+      summary: "Add Project Role"
+      description: "This can only be done by company."
+      operationId: "addProjectRole"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Project id"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Add Project Role"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectRoleRequest"
+      responses:
+        "200":
+          description: "Project Role has been created"
+        "400":
+          description: "Validation Error"
+        "401":
+          description: "You are not in this company"
+      security:
+        - api_key: []
+  /company/project/{project_id}/role/{role_id}:
+    post:
+      tags:
+      - "ProjectRole"
+      summary: "Update existing projec role"
+      description: "Returns updated project role data"
+      operationId: "updateProjectRole"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        description: "Project Id"
+        required: true
+        type: "integer"
+      - name: "role_id"
+        in: "path"
+        description: "Role Id"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectRoleRequest"
+      responses:
+        "200":
+          description: "Project Role has been updated"
+        "400":
+          description: "Validation Error"
+        "401":
+          description: "You are not in this company"
+        "404":
+          description: "Project Role not found"
+      security:
+        - api_key: []
+
+  /company/project/{project_id}/{project_role_id}/project-member/add:
+    post:
+      tags:
+      - "ProjectMember"
+      summary: "Add Project Member"
+      description: "This can only be done by company."
+      operationId: "addProjectMember"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        description: "Project id"
+        required: true
+        type: "integer"
+      - name: "project_role_id"
+        in: "path"
+        description: "Project Role id"
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "body"
+        description: "Add Project Member"
+        required: true
+        schema:
+          $ref: "#/definitions/ProjectMember"
+      responses:
+        "200":
+          description: "Project Member has been created"
+        "400":
+          description: "Validation Error"
+        "401":
+          description: "You are not in this company"
+      security:
+        - api_key: []
+  /company/project/{project_id}/project-member:
+    get:
+      tags:
+      - "ProjectMember"
+      summary: "Get project member by project id"
+      description: "Return Project member"
+      operationId: "getProjectMemberByProjectId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        description: "Project id"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Data Retrieved"
+          schema:
+            $ref: "#/definitions/ProjectMember"
+        "404":
+          description: "Data Not Found"
+      security:
+        - api_key: []
+  /company/project/{project_id}/role/{role_id}/remove/{id}/role:
+    delete:
+      tags:
+      - "ProjectMember"
+      summary: "Delete Existing project member"
+      description: "Deletes a record and returns no content"
+      operationId: "deleteProjectMember"
+      produces:
+      - "application/json"
+      parameters:
+        - name: "project_id"
+          in: "path"
+          description: "Project id"
+          required: true
+          type: "integer"
+        - name: "role_id"
+          in: "path"
+          description: "Role id"
+          required: true
+          type: "integer"
+        - name: "id"
+          in: "path"
+          description: "Project Member Id"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "Project Member has been removed"
+        "401":
+          description: "You are not in this company"
+        "404":
+          description: "Project Member not found"
+      security:
+        - api_key: []
+  # /company/project/{project_id}/role/{role_id}/applicants:
+
+
+
+  /company/project/{project_id}/finish:
+    post:
+      tags:
+      - "Project"
+      summary: "Finish a Project"
+      description: ""
+      operationId: "finishProject"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "project_id"
+        in: "path"
+        description: "Project id"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Project is Done"
+        "400":
+          description: "Something went wrong"
+        "401":
+          description: "You are not in this company"
+      security:
+        - api_key: []
+        
+      
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      email:
+        type: "string"
+      profile:
+        type: "string"
+      bio:
+        type: "string"
+      username:
+        type: "string"
+      address:
+        type: "string"
+      last_education:
+        type: "string"
+      company_id:
+        type: "integer"
+        format: "int64"
+      verify:
+        type: "string"
+      passsword:
+        type: "string"
+  UserRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      email:
+        type: "string"
+      username:
+        type: "string"
+      address:
+        type: "string"
+      verify:
+        type: "string"
+      passsword:
+        type: "string"
+   
+  Company:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      profile:
+        type: "string"
+      bio:
+        type: "string"
+      address:
+        type: "string"
+      category: 
+        type: "string"
+      email:
+        type: "string"
+      contct:
+        type: "string"
+
+  CompanyResponse:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      address:
+        type: "string"
+      category: 
+        type: "string"
+      
+  Project:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      image:
+        type: "string"
+      description:
+        type: "string"
+      active:
+        type: "string"
+      company_id: 
+        type: "integer"
+        format: "int64"
+
+  ProjectRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      image:
+        type: "string"
+      description:
+        type: "string"
+      
+  ProjectMember:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      project_id:
+        type: "integer"
+        format: "int64"
+      project_role_id:
+        type: "integer"
+        format: "int64"
+      user_id:
+        type: "integer"
+        format: "int64"
+      certificate: 
+        type: "string"
+      
+  ProjectRole:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      quota:
+        type: "integer"
+      description:
+        type: "string"
+      project_id:
+        type: "integer"
+        format: "int64"
+      extra_question: 
+        type: "string"
+
+  ProjectRoleRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      quota:
+        type: "integer"
+      description:
+        type: "string"
+    
+  Apply:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      user_id:
+        type: "integer"
+        format: "int64"
+      project_role_id:
+        type: "integer"
+        format: "int64"
+      cv:
+        type: "string"
+      extra_answer:
+        type: "string"
+   
+  
