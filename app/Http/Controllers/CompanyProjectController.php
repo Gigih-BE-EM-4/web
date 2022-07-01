@@ -33,10 +33,28 @@ class CompanyProjectController extends Controller
         return ResponseFormatter::error(null, 'Project not found', 404, "{$id} not found");
       }
     }
-    // return Auth::user();
-    $project = Project::where('company_id', Auth::user()->company_id)->latest();
 
-    return ResponseFormatter::success($project->paginate($limit), "Data Successfully Retrieved");
+    $project = Project::where('company_id', Auth::user()->company_id)->paginate($limit);
+    $role = ProjectRole::all();
+    $data["project"] = Project::find(1);
+    $data["project"]["roles"] = Project::find(1)->projectRoles;
+    return $data;
+
+    if ($project) {
+      foreach ($project as $data) {
+        $data->project_role =
+          $role->filter(function ($value, $key) use ($data) {
+            if ($value['project_id'] == $data->id) {
+              return $value;
+            }
+          })->values();
+      }
+
+
+      return ResponseFormatter::success($project, "Data Successfully Retrieved");
+    } else {
+      return ResponseFormatter::error(null, "Data not found", 400, "Data not found");
+    }
   }
 
   public function createProject(Request $request)
