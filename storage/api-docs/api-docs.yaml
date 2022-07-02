@@ -4,7 +4,10 @@ info:
   description: CariPengalaman.com API documentation
   version: 1.0.0
 servers:
+- url: http://54.169.231.114/capstone/public/
+  description: Main (production) server
 - url: /api
+  description: Internal staging server for testing
 tags:
 - name: User
   description: Operations about user
