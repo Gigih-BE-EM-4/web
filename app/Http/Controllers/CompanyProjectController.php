@@ -21,6 +21,45 @@ class CompanyProjectController extends Controller
   {
     $id = $request->input('id');
     $limit = $request->input('limit', 5);
+
+    if ($id) {
+      $project = Project::find($id);
+
+      if ($project) {
+        $data["project"] = $project;
+        $data["project"]["roles"] = $project->projectRoles;
+        return ResponseFormatter::success($data, 'Project found');
+      } else {
+        return ResponseFormatter::error(null, 'Project not found', 404, "{$id} not found");
+      }
+    }
+
+    $project = Project::where('active', 1)
+      ->where('isfinished', 0)
+      ->paginate($limit);
+    $role = ProjectRole::all();
+
+    if ($project) {
+      foreach ($project as $data) {
+        $data->project_role =
+          $role->filter(function ($value, $key) use ($data) {
+            if ($value['project_id'] == $data->id) {
+              return $value;
+            }
+          })->values();
+      }
+
+
+      return ResponseFormatter::success($project, "Data Successfully Retrieved");
+    } else {
+      return ResponseFormatter::error(null, "Data not found", 400, "Data not found");
+    }
+  }
+
+  public function getAllCompanyProjects(Request $request)
+  {
+    $id = $request->input('id');
+    $limit = $request->input('limit', 5);
     $active = $request->input('active');
 
 
@@ -28,7 +67,9 @@ class CompanyProjectController extends Controller
       $project = Project::find($id);
 
       if ($project) {
-        return ResponseFormatter::success($project, 'Project found');
+        $data["project"] = $project;
+        $data["project"]["roles"] = $project->projectRoles;
+        return ResponseFormatter::success($data, 'Project found');
       } else {
         return ResponseFormatter::error(null, 'Project not found', 404, "{$id} not found");
       }
@@ -36,9 +77,7 @@ class CompanyProjectController extends Controller
 
     $project = Project::where('company_id', Auth::user()->company_id)->paginate($limit);
     $role = ProjectRole::all();
-    $data["project"] = Project::find(1);
-    $data["project"]["roles"] = Project::find(1)->projectRoles;
-    return $data;
+
 
     if ($project) {
       foreach ($project as $data) {
