@@ -233,7 +233,7 @@ paths:
             schema:
               type: string
               format: binary
-        required: true
+        required: true 
       responses:
         201:
           description: user has been updated
@@ -308,9 +308,15 @@ paths:
       description: User apply to a project
       operationId: applyProject
       parameters:
-      - name: project role id
+      - name: project_id
         in: query
-        description: input project role
+        description: input project id
+        required: true
+        schema:
+          type: string
+      - name: project_role_id
+        in: query
+        description: input project role id
         required: true
         schema:
           type: string
@@ -551,6 +557,19 @@ paths:
       summary: Join a company
       description: This can only be done by the logged in user.
       operationId: joinCompany
+      parameters:
+      - name: company_id
+        in: query
+        description: input company id
+        required: true
+        schema:
+          type: integer
+      - name: user_id
+        in: query
+        description: input user id
+        required: true
+        schema:
+          type: integer
       # requestBody:
       #   description: Join a company as a member
       #   content:
@@ -887,7 +906,7 @@ paths:
         required: true
         schema:
           type: integer
-      - name: User Id
+      - name: user_id
         in: query
         description:  User Id to add to be Project Member
         required: true
