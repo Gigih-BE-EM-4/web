@@ -7,7 +7,7 @@ servers:
 - url: http://54.169.231.114/capstone/public/api
   description: Main (production) server
 - url: /api
-  description: Internal staging server for testing
+  description: Local Server
 tags:
 - name: User
   description: Operations about user
@@ -28,6 +28,7 @@ paths:
       tags:
       - User
       summary: Register user into the system
+      description: after register user will get a verify token, user need that token to verify an user account
       operationId: registerUser
       parameters:
       - name: name
@@ -88,7 +89,8 @@ paths:
     post:
       tags:
       - User
-      summary: Logs user into the system
+      summary: Logs user into the system 
+      description: user need to verify the account first with the verify token that already given after register.
       operationId: loginUser
       parameters:
       - name: username
@@ -141,7 +143,8 @@ paths:
     get:
       tags:
       - User
-      summary: Verify a User account
+      summary: Verify a User account after register
+      description: verify a user account using verify token that already get after register an account
       operationId: verifyUser
       parameters:
       - name: verify
@@ -187,9 +190,10 @@ paths:
       tags:
       - User
       summary: Check if user account is verify or not
+      description: user account need to be verify first in order to get authorize to the full feature of the API
       operationId: isVerify
       responses:
-        201:
+        200:
           description: user is verified
           content: {}
         401:
@@ -236,7 +240,11 @@ paths:
             schema:
               type: string
               format: binary
-        required: true 
+        required: true
+            # multipart/form-data:
+            #   schema:
+            #     type: string
+            #     format: binary     
       responses:
         201:
           description: user has been updated
@@ -265,6 +273,7 @@ paths:
     get:
       tags:
       - User
+      description: endpoint to check whether user already login or not
       responses:
         200:
           description: user is logged in
@@ -276,7 +285,7 @@ paths:
       tags:
       - User
       summary: get all user certificcates
-      description: Return all user certificates
+      description: Get all user certificates
       operationId: getAllCerficate
       responses:
         200:
@@ -292,7 +301,7 @@ paths:
       tags:
       - User
       summary: get user certificate in a project
-      description: Return user certificate as a project member in a project
+      description: Get user certificate as a project member in a project
       operationId: getCerficate
       responses:
         200:
@@ -308,7 +317,7 @@ paths:
       tags:
       - User
       summary: apply to a project
-      description: User apply to a project
+      description: User apply to a project and a specific role in the project
       operationId: applyProject
       parameters:
       - name: project_id
@@ -331,7 +340,7 @@ paths:
           type: string
       requestBody:
         content:
-          cv/pdf:
+          image/png:
             schema:
               type: string
               format: binary
@@ -360,6 +369,7 @@ paths:
       tags:
       - User
       summary: Get user detail by user id
+      description: Get the detail of the user account using user id
       operationId: getUserById
       parameters:
       - name: id
@@ -378,14 +388,14 @@ paths:
         404:
           description: User not found
           content: {}
-      security:
-      - bearerAuth: [] 
+      # security:
+      # - bearerAuth: [] 
   /user:
     post:
       tags:
       - User
       summary: Updated user
-      description: This can only be done by the logged in user.
+      description: Update an user accounnt.
       operationId: updateUser
       parameters:
       - name: name
@@ -438,6 +448,7 @@ paths:
       - Company
       summary: Create a Company
       operationId: createCompany
+      description: create a new company, can be done only by a logged in user
       parameters:
       - name: name
         in: query
@@ -521,7 +532,7 @@ paths:
       tags:
       - Company
       summary: Get list of companies
-      description: Returns list of company
+      description: Get list of company
       operationId: getCompany
       responses:
         200:
@@ -535,7 +546,7 @@ paths:
       tags:
       - Company
       summary: Get company detail by id
-      description: Return Company Detail
+      description: Get Company Detail using company id
       operationId: getCompanyById
       parameters:
       - name: company_id
@@ -558,7 +569,7 @@ paths:
       tags:
       - Company
       summary: Join a company
-      description: This can only be done by the logged in user.
+      description: Join a company as company member.
       operationId: joinCompany
       parameters:
       - name: company_id
@@ -598,7 +609,7 @@ paths:
       tags:
       - Company
       summary: Leave a company
-      description: This can only be done by the logged in user.
+      description: Leave a company.
       operationId: leaveCompany
       responses:
         200:
@@ -636,7 +647,7 @@ paths:
       tags:
       - Project
       summary: Create new Project
-      description: This can only be done by company
+      description: Create a new project, This can only be done by company
       operationId: createProject
       parameters:
       - name: name
@@ -678,22 +689,22 @@ paths:
       security:
       - bearerAuth: [] 
       x-codegen-request-body-name: body
-  /company/project/{id}:
+  /projects:
     get:
       tags:
       - Project
-      summary: Get project detail by id
-      description: Return Project Detail
-      operationId: getProjectById
-      parameters:
-      - name: id
-        in: path
-        description: Project id
-        required: true
-        schema:
-          type: integer
+      summary: Get project detail
+      description: get Project Detail
+      operationId: getProjectDetail
+      # parameters:
+      # - name: id
+      #   in: path
+      #   description: Project id
+      #   required: true
+      #   schema:
+      #     type: integer
       responses:
-        200:
+        201:
           description: Data Successfully Retrieved
           content:
             application/json:
@@ -702,13 +713,14 @@ paths:
         404:
           description: Project Not Found
           content: {}
-      security:
-      - bearerAuth: [] 
+      # security:
+      # - bearerAuth: [] 
+  /company/project/{id}:
     post:
       tags:
       - Project
       summary: Update existing project
-      description: Returns updated project data
+      description: updated a project data
       operationId: updateProject
       parameters:
       - name: id
@@ -763,7 +775,7 @@ paths:
       tags:
       - Project
       summary: Get All Project
-      description: Return list of Project
+      description: Get list of Project in the company
       operationId: getProject
       responses:
         200:
@@ -782,7 +794,7 @@ paths:
       tags:
       - ProjectRole
       summary: Add Project Role
-      description: This can only be done by company.
+      description: Create a new project role, This can only be done by company an after the company have a project.
       operationId: addProjectRole
       parameters:
       - name: id
@@ -834,7 +846,7 @@ paths:
       tags:
       - ProjectRole
       summary: Update existing project role
-      description: Returns updated project role data
+      description: updated project role data
       operationId: updateProjectRole
       parameters:
       - name: project_id
@@ -894,7 +906,7 @@ paths:
       tags:
       - ProjectMember
       summary: Add Project Member
-      description: This can only be done by company.
+      description: Add a project member to a project, This can only be done by company after screening applicant data.
       operationId: addProjectMember
       parameters:
       - name: project_id
@@ -917,7 +929,7 @@ paths:
           type: string
       requestBody:
         content:
-          certificate/pdf:
+          image/png:
             schema:
               type: string
               format: binary
@@ -947,7 +959,7 @@ paths:
       tags:
       - ProjectMember
       summary: Get project member by project id
-      description: Return Project member
+      description: Get All the Project member in a specific project
       operationId: getProjectMemberByProjectId
       parameters:
       - name: project_id
@@ -973,7 +985,7 @@ paths:
       tags:
       - ProjectMember
       summary: Delete Existing project member
-      description: Deletes a record and returns no content
+      description: Deletes a project member from a project
       operationId: deleteProjectMember
       parameters:
       - name: project_id
@@ -1011,7 +1023,7 @@ paths:
       tags:
       - Project
       summary: Get All Applicants
-      description: Return list of Project
+      description: Get list of applicants in a Project and in a specific role
       operationId: getApplicants
       parameters:
       - name: project_id
@@ -1074,7 +1086,7 @@ paths:
       tags:
       - Project
       summary: send certificate
-      description: send certificate to a project member
+      description: send certificate to a project member, this can be done after a project finished
       operationId: sendCertificate
       parameters:
       - name: project_id
