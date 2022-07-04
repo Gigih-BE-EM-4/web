@@ -240,11 +240,11 @@ paths:
             schema:
               type: string
               format: binary
+          # application/json:
+          #   schema:
+          #     type: object
+          #     format: base64    
         required: true
-            # multipart/form-data:
-            #   schema:
-            #     type: string
-            #     format: binary     
       responses:
         201:
           description: user has been updated
@@ -332,15 +332,15 @@ paths:
         required: true
         schema:
           type: string
-      - name: extra answer
+      - name: extra_answer
         in: query
         description: input your extra answer
-        required: false
+        required: true
         schema:
-          type: string
+          type: array
       requestBody:
         content:
-          image/png:
+          multipart/form-data:
             schema:
               type: string
               format: binary
@@ -569,7 +569,7 @@ paths:
       tags:
       - Company
       summary: Join a company
-      description: Join a company as company member.
+      description: Invite someone to a company, This is can only be done by someone who has the company.
       operationId: joinCompany
       parameters:
       - name: company_id
@@ -611,6 +611,13 @@ paths:
       summary: Leave a company
       description: Leave a company.
       operationId: leaveCompany
+      # parameters:
+      # - name: company_id
+      #   in: query
+      #   description: input company id
+      #   required: true
+      #   schema:
+      #     type: integer
       responses:
         200:
           description: Success Leave Company
@@ -693,16 +700,16 @@ paths:
     get:
       tags:
       - Project
-      summary: Get project detail
+      summary: Get Project Detail
       description: get Project Detail
-      operationId: getProjectDetail
-      # parameters:
-      # - name: id
-      #   in: path
-      #   description: Project id
-      #   required: true
-      #   schema:
-      #     type: integer
+      operationId: getProject
+      parameters:
+      - name: id
+        in: query
+        description: Project id
+        required: true
+        schema:
+          type: integer
       responses:
         201:
           description: Data Successfully Retrieved
@@ -774,16 +781,19 @@ paths:
     get:
       tags:
       - Project
-      summary: Get All Project
+      summary: Get All Company Project
       description: Get list of Project in the company
-      operationId: getProject
+      operationId: getAllCompanyProject
       responses:
-        200:
+        201:
           description: Data Successfully Retrieved
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Project'
+        401:
+          description: You are not in this company
+          content: {}
         404:
           description: Project Not Found
           content: {}
@@ -942,7 +952,7 @@ paths:
       #         $ref: '#/components/schemas/ProjectMember'
       #   required: true
       responses:
-        200:
+        201:
           description: Project Member has been created
           content: {}
         400:
@@ -980,7 +990,7 @@ paths:
           content: {}
       security:
       - bearerAuth: [] 
-  /company/project/{project_id}/role/{role_id}/remove/{id}/role:
+  /company/project/{project_id}/role/{role_id}/remove/{id}:
     delete:
       tags:
       - ProjectMember
@@ -1103,7 +1113,7 @@ paths:
           type: integer
       requestBody:
         content:
-          certificate/pdf:
+          multipart/form-data:
             schema:
               type: string
               format: binary
