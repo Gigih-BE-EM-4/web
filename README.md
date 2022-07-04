@@ -18,7 +18,7 @@ mengirimkan curriculum vitae atau CV dan beberapa data pendukung dengan lowongan
 
 
 ### Install Aplikasi
-1. Para terminal, clone repo dengan git `git clone https://github.com/nafiesl/mini-socmed.git`
+1. Para terminal, clone repo dengan git `git clone https://github.com/Gigih-BE-EM-4/web.git`
 2. `cd web`
 3. `cp .env.example .env`
 4. `composer install/update`
