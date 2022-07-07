@@ -286,6 +286,18 @@ class CompanyProjectController extends Controller
       'extra_answer' => 'array',
     ]);
   }
+  private function uploadCV($request)
+  {
+    if ($file = $request->hasFile('cv')) {
+      $file = $request->file('cv');
+      $fileName = time() . $file->getClientOriginalName();
+      $destinationPath = public_path() . '/user/cv/' . Auth::user()->id . "/";
+      $file->move($destinationPath, $fileName);
+      return "/User/cv/" . Auth::user()->id . "/" . $fileName;
+    } else {
+      return "";
+    }
+  }
   public function applyProject(Request $request)
   {
     $validate = $this->UploadCVValidator($request);
