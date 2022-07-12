@@ -101,7 +101,7 @@ paths:
           type: string
       - name: password
         in: query
-        description: The password for login in clear text
+        description: The password for login 
         required: true
         schema:
           type: string
@@ -214,6 +214,12 @@ paths:
         required: true
         schema:
           type: string
+      - name: confirm password
+        in: query
+        description: confirm new password
+        required: true
+        schema:
+          type: string
       responses:
         201:
           description: user has been updated
@@ -234,16 +240,16 @@ paths:
       tags:
       - User
       summary: Change user profile.
+      operationId: changeProfile
       requestBody:
         content:
-          image/png:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
-          # application/json:
-          #   schema:
-          #     type: object
-          #     format: base64    
+              type: object
+              properties:
+                profile:
+                  type: string
+                  format: binary
         required: true
       responses:
         201:
@@ -300,9 +306,9 @@ paths:
     get:
       tags:
       - User
-      summary: get user certificate in a project
-      description: Get user certificate as a project member in a project
-      operationId: getCerficate
+      summary: get All user Projects
+      description: ""
+      operationId: getAllProject
       responses:
         200:
           description: Success
@@ -325,25 +331,30 @@ paths:
         description: input project id
         required: true
         schema:
-          type: string
+          type: integer
       - name: project_role_id
         in: query
         description: input project role id
         required: true
         schema:
-          type: string
-      - name: extra_answer
+          type: integer
+      - name: extra_answer[]
         in: query
         description: input your extra answer
         required: true
         schema:
           type: array
+          items:
+              type: string
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                cv:
+                  type: string
+                  format: binary
         required: true
       # requestBody:
       #   content:
@@ -488,10 +499,13 @@ paths:
           type: string
       requestBody:
         content:
-          image/png:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                profile:
+                  type: string
+                  format: binary
         required: false
       # requestBody:
       #   content:
@@ -671,10 +685,13 @@ paths:
           type: string
       requestBody:
         content:
-          image/png:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
         required: false
       # requestBody:
       #   description: Created company object
@@ -750,10 +767,13 @@ paths:
           type: string
       requestBody:
         content:
-          image/png:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
         required: false
       # requestBody:
       #   content:
@@ -939,10 +959,13 @@ paths:
           type: string
       requestBody:
         content:
-          image/png:
+          multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                certificate:
+                  type: string
+                  format: binary
         required: false
       # requestBody:
       #   description: Add Project Member
@@ -979,7 +1002,7 @@ paths:
         schema:
           type: integer
       responses:
-        200:
+        201:
           description: Data Retrieved
           content:
             application/json:
@@ -1115,23 +1138,15 @@ paths:
         content:
           multipart/form-data:
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                certificate:
+                  type: string
+                  description: upload project certificate (pdf format).
+                  format: binary
         required: true
-      # requestBody:
-      #   content:
-      #     multipart/form-data:
-      #       schema:
-      #         required:
-      #         - certificate
-      #         properties:
-      #           certificate:
-      #             type: string
-      #             description: upload project certificate (pdf format).
-      #             format: binary
-      #   required: true
       responses:
-        200:
+        201:
           description: Success
           content: {}
         400:

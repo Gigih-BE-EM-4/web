@@ -6,8 +6,9 @@ mengirimkan curriculum vitae atau CV dan beberapa data pendukung dengan lowongan
 
 ## Dokumentasi API dengan Swagger
 
-| URL | http://54.169.231.114/capstone/public/api/documentation|
+| URL in Deploy Server| http://54.169.231.114/capstone/public/api/documentation|
 | --- | --- |
+| URL in Local Server | {your-local-server-name}/api/documentation, example: http://localhost:8000/api/documentation/|
 
 
 ## Instalasi
