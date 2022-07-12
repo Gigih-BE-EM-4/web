@@ -334,7 +334,7 @@ class CompanyProjectController extends Controller
         return ResponseFormatter::error(null, 'You are not in this company', 401, "You are not in this company");
       }
 
-      $applicants = Apply::with(['user', 'projectRole'])->where('project_id', $project_id)->where('project_role_id', $role_id)->get(['user_id', 'project_role_id']);
+      $applicants = Apply::with(['user', 'projectRole'])->where('project_id', $project_id)->where('project_role_id', $role_id)->get();
 
       if (count($applicants) > 0) {
         return ResponseFormatter::success($applicants, "Applicants has been retrieved");
