@@ -363,7 +363,7 @@ paths:
       #         $ref: '#/components/schemas/Apply'
       #   required: true
       responses:
-        200:
+        201:
           description: apply has been sent.
           content: {}
         400:
@@ -851,6 +851,12 @@ paths:
         required: true
         schema:
           type: string
+      - name: extra_question
+        in: query
+        description: input your extra question
+        required: false
+        schema:
+          type: string
       # requestBody:
       #   description: Add Project Role
       #   content:
@@ -859,7 +865,7 @@ paths:
       #         $ref: '#/components/schemas/ProjectRoleRequest'
       #   required: true
       responses:
-        200:
+        201:
           description: Project Role has been created
           content: {}
         400:
@@ -909,6 +915,12 @@ paths:
         required: true
         schema:
           type: string
+      - name: extra_question
+        in: query
+        description: input your extra question
+        required: false
+        schema:
+          type: string
       # requestBody:
       #   content:
       #     '*/*':
@@ -916,7 +928,7 @@ paths:
       #         $ref: '#/components/schemas/ProjectRoleRequest'
       #   required: true
       responses:
-        200:
+        201:
           description: Project Role has been updated
           content: {}
         400:
