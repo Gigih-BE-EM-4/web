@@ -18,7 +18,7 @@ class CreateProjectsTable extends Migration
       $table->string('name');
       $table->string('images');
       $table->string('description');
-      $table->integer('active')->default(0);
+      $table->integer('active')->default(1);
       $table->integer('isfinished')->default(0);
       $table->integer('company_id');
       $table->timestamps();
